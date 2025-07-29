@@ -61,7 +61,18 @@ export default function CharacterSheet() {
 
   const handleLevelChange = async (newLevel: number) => {
     if (!character?.id) return;
+    
+    // Update character level
     await updateCharacterLevel.mutateAsync({ level: newLevel });
+    
+    // If not using override, update dice pool to match new level
+    if (!isUsingOverride) {
+      const newLevelDice = SPIRIT_DIE_PROGRESSION[newLevel] || ['d4'];
+      await updateSpiritDiePool.mutateAsync({
+        currentDice: newLevelDice,
+        overrideDice: null
+      });
+    }
   };
 
   const handleDiceOverride = async (dice: DieSize[]) => {
@@ -109,6 +120,14 @@ export default function CharacterSheet() {
         currentDice: newDice
       });
     }
+  };
+
+  const handleRestoreAll = async () => {
+    if (!character?.id) return;
+    
+    await updateSpiritDiePool.mutateAsync({
+      currentDice: originalDice
+    });
   };
 
   const handleEditTechnique = (technique: Technique) => {
@@ -229,6 +248,7 @@ export default function CharacterSheet() {
                 selectedDieIndex={selectedDieIndex}
                 onDieSelect={handleDieSelect}
                 onDieRestore={handleDieRestore}
+                onRestoreAll={handleRestoreAll}
               />
             )}
           </CardContent>

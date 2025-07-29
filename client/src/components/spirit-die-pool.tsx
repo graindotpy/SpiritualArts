@@ -11,6 +11,7 @@ interface SpiritDiePoolProps {
   selectedDieIndex: number | null;
   onDieSelect: (index: number) => void;
   onDieRestore: (index: number) => void;
+  onRestoreAll: () => void;
 }
 
 export default function SpiritDiePoolComponent({ 
@@ -19,7 +20,8 @@ export default function SpiritDiePoolComponent({
   originalDice,
   selectedDieIndex, 
   onDieSelect,
-  onDieRestore
+  onDieRestore,
+  onRestoreAll
 }: SpiritDiePoolProps) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -63,7 +65,18 @@ export default function SpiritDiePoolComponent({
         
         {currentDice.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No active dice remaining</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">No active dice remaining</p>
+            {originalDice.length > 0 && (
+              <Button
+                onClick={onRestoreAll}
+                variant="outline"
+                size="sm"
+                className="bg-spiritual-50 border-spiritual-200 text-spiritual-700 hover:bg-spiritual-100 dark:bg-spiritual-900 dark:border-spiritual-700 dark:text-spiritual-300 dark:hover:bg-spiritual-800"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Restore All Dice ({originalDice.join(', ')})
+              </Button>
+            )}
           </div>
         )}
         
