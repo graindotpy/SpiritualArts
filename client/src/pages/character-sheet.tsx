@@ -5,19 +5,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, Moon, Sun } from "lucide-react";
 import SpiritDiePoolComponent from "@/components/spirit-die-pool";
 import TechniqueCard from "@/components/technique-card";
 import DieRoller from "@/components/die-roller";
 import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import { useCharacterState } from "@/hooks/use-character-state";
+import { useTheme } from "@/components/theme-provider";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
 
 export default function CharacterSheet() {
+  const { theme, toggleTheme } = useTheme();
   const [selectedTechnique, setSelectedTechnique] = useState<string | null>(null);
   const [selectedSP, setSelectedSP] = useState<number>(0);
+  const [selectedDieIndex, setSelectedDieIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
@@ -47,6 +50,16 @@ export default function CharacterSheet() {
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
 
+  // Auto-select first die if none selected and dice are available
+  if (selectedDieIndex === null && currentDice.length > 0) {
+    setSelectedDieIndex(0);
+  }
+
+  // Reset selection if die no longer exists
+  if (selectedDieIndex !== null && selectedDieIndex >= currentDice.length) {
+    setSelectedDieIndex(currentDice.length > 0 ? 0 : null);
+  }
+
   const handleLevelChange = async (newLevel: number) => {
     if (!character?.id) return;
     await updateCharacterLevel.mutateAsync({ level: newLevel });
@@ -75,8 +88,15 @@ export default function CharacterSheet() {
   };
 
   const handleRoll = async () => {
-    if (!selectedTechnique || !selectedSP) return;
-    await rollSpiritedie.mutateAsync({ spInvestment: selectedSP });
+    if (!selectedTechnique || !selectedSP || selectedDieIndex === null) return;
+    await rollSpiritedie.mutateAsync({ 
+      spInvestment: selectedSP,
+      dieIndex: selectedDieIndex 
+    });
+  };
+
+  const handleDieSelect = (index: number) => {
+    setSelectedDieIndex(index);
   };
 
   const handleEditTechnique = (technique: Technique) => {
@@ -103,14 +123,22 @@ export default function CharacterSheet() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-spiritual-700">Spiritual Arts - Spirit Die System</h1>
+              <h1 className="text-xl font-bold text-spiritual-700 dark:text-spiritual-400">Spiritual Arts - Spirit Die System</h1>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            >
+              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
           </div>
         </div>
       </header>
@@ -185,6 +213,8 @@ export default function CharacterSheet() {
               <SpiritDiePoolComponent 
                 pool={spiritDiePool} 
                 currentDice={currentDice}
+                selectedDieIndex={selectedDieIndex}
+                onDieSelect={handleDieSelect}
               />
             )}
           </CardContent>
@@ -230,6 +260,7 @@ export default function CharacterSheet() {
             <DieRoller
               selectedTechnique={selectedTechniqueData}
               selectedSP={selectedSP}
+              selectedDie={selectedDieIndex !== null ? currentDice[selectedDieIndex] : null}
               onRoll={handleRoll}
               isRolling={rollSpiritedie.isPending}
             />

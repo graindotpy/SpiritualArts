@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Roll spirit die
   app.post("/api/character/:id/roll", async (req, res) => {
     try {
-      const { spInvestment } = req.body;
+      const { spInvestment, dieIndex = 0 } = req.body;
       if (!spInvestment || spInvestment < 1) {
         return res.status(400).json({ message: "Invalid SP investment" });
       }
@@ -83,8 +83,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No dice available to roll" });
       }
 
-      // Roll a random die from the pool
-      const dieIndex = Math.floor(Math.random() * currentDice.length);
+      // Validate die index
+      if (dieIndex < 0 || dieIndex >= currentDice.length) {
+        return res.status(400).json({ message: "Invalid die index" });
+      }
+
       const dieSize = currentDice[dieIndex];
       const dieMax = parseInt(dieSize.substring(1));
       const rollValue = Math.floor(Math.random() * dieMax) + 1;
@@ -113,6 +116,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update the pool
       await storage.updateSpiritDiePool(req.params.id, { currentDice: newDicePool });
 
+      console.log(`Roll result for ${spInvestment} SP using die ${dieIndex} (${dieSize}):`, {
+        value: rollValue,
+        success,
+        newDicePool
+      });
+
       res.json({
         value: rollValue,
         success,
@@ -120,6 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dieRolled: dieSize
       });
     } catch (error) {
+      console.error("Error rolling die:", error);
       res.status(500).json({ message: "Failed to roll die" });
     }
   });

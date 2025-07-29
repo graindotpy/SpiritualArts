@@ -30,7 +30,7 @@ export function useCharacterState(characterId: string | undefined) {
   });
 
   const rollSpiritedie = useMutation({
-    mutationFn: async (data: { spInvestment: number }) => {
+    mutationFn: async (data: { spInvestment: number; dieIndex?: number }) => {
       if (!characterId) throw new Error("No character ID");
       const response = await apiRequest("POST", `/api/character/${characterId}/roll`, data);
       return response.json();
