@@ -52,7 +52,7 @@ export default function CharacterSelector({
               key={character.id}
               className={`cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
                 character.id === currentCharacterId 
-                  ? 'ring-2 ring-spiritual-500 bg-spiritual-50 dark:bg-spiritual-900/20' 
+                  ? 'ring-2 ring-spiritual-500 bg-gray-100 dark:bg-gray-800' 
                   : ''
               }`}
               onClick={() => handleCharacterSelect(character)}
