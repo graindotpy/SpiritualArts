@@ -48,6 +48,14 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   // Original dice should always be level-based unless there's an explicit override
   const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice as DieSize[];
 
+  // Debug logging to understand the restore button issue
+  console.log('Debug - Character level:', character.level);
+  console.log('Debug - Level based dice:', levelBasedDice);
+  console.log('Debug - Current dice:', currentDice);
+  console.log('Debug - Original dice:', originalDice);
+  console.log('Debug - Is using override:', isUsingOverride);
+  console.log('Debug - Spirit die pool data:', spiritDiePool);
+
   // Auto-select first die if none selected and dice are available
   if (selectedDieIndex === null && currentDice.length > 0) {
     setSelectedDieIndex(0);
