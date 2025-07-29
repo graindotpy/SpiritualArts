@@ -217,7 +217,7 @@ export default function ImageCropEditor({ imageUrl, onSave, onCancel }: ImageCro
           <Slider
             value={zoom}
             onValueChange={handleZoomChange}
-            min={0.5}
+            min={0.2}
             max={3}
             step={0.1}
             className="flex-1"

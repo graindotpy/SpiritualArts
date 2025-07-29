@@ -34,7 +34,7 @@ The application follows a clear separation between frontend and backend:
 - Automatic cleanup of old portrait files when updating or deleting
 - **NEW: Advanced Image Crop Editor** - Drag and zoom controls for perfect portrait positioning
   - Interactive canvas-based editor with circular crop preview
-  - Zoom slider for precise image scaling (0.5x to 3x)
+  - Zoom slider for precise image scaling (0.2x to 3x)
   - Drag functionality to position image within crop area
   - Reset button to center image
   - Real-time preview of final circular portrait
