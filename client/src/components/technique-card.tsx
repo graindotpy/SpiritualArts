@@ -200,7 +200,9 @@ export default function TechniqueCard({
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(technique.id);
+                if (confirm(`Are you sure you want to delete "${technique.name}"? This cannot be undone.`)) {
+                  onDelete(technique.id);
+                }
               }}
               className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 h-auto p-1"
             >

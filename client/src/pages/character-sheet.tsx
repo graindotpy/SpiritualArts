@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Home, Moon, Sun, TrendingUp } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import SpiritDiePoolComponent from "@/components/spirit-die-pool";
 import TechniqueCard from "@/components/technique-card";
-import DieRoller from "@/components/die-roller";
 import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import EditableCharacterHeader from "@/components/editable-character-header";
@@ -45,14 +46,31 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
     queryKey: ["/api/character", currentCharacter.id, "spirit-die-pool"],
   });
 
-  const { data: techniques = [] } = useQuery<Technique[]>({
+  const techniquesQuery = useQuery<Technique[]>({
     queryKey: ["/api/character", currentCharacter.id, "techniques"],
   });
+  const techniques = techniquesQuery.data || [];
 
   const {
     updateSpiritDiePool,
     rollSpiritedie
   } = useCharacterState(currentCharacter.id);
+
+  const { toast } = useToast();
+
+  // Delete technique mutation
+  const deleteTechniqueMutation = useMutation({
+    mutationFn: async (techniqueId: string) => {
+      return await apiRequest(`/api/techniques/${techniqueId}`, { method: "DELETE" });
+    },
+    onSuccess: () => {
+      techniquesQuery.refetch();
+      toast({ title: "Technique deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete technique", variant: "destructive" });
+    }
+  });
 
   // Get level-based dice or use override
   const levelBasedDice = SPIRIT_DIE_PROGRESSION[currentCharacter.level] || ['d4'];
@@ -142,6 +160,10 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const handleEditTechnique = (technique: Technique) => {
     setEditingTechnique(technique);
     setIsEditorOpen(true);
+  };
+
+  const handleDeleteTechnique = (techniqueId: string) => {
+    deleteTechniqueMutation.mutate(techniqueId);
   };
 
   const handleAddTechnique = () => {
@@ -253,6 +275,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
                   isSelected={false}
                   onSelect={handleTechniqueSelect}
                   onEdit={() => handleEditTechnique(technique)}
+                  onDelete={handleDeleteTechnique}
                 />
               ))}
               
