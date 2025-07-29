@@ -28,21 +28,29 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
   const [isLevelEditorOpen, setIsLevelEditorOpen] = useState(false);
 
+  // Fetch fresh character data to ensure we have the latest level
+  const { data: freshCharacter } = useQuery<Character>({
+    queryKey: ["/api/character", character.id],
+  });
+
+  // Use fresh character data if available, fallback to prop
+  const currentCharacter = freshCharacter || character;
+
   const { data: spiritDiePool } = useQuery<SpiritDiePool>({
-    queryKey: ["/api/character", character.id, "spirit-die-pool"],
+    queryKey: ["/api/character", currentCharacter.id, "spirit-die-pool"],
   });
 
   const { data: techniques = [] } = useQuery<Technique[]>({
-    queryKey: ["/api/character", character.id, "techniques"],
+    queryKey: ["/api/character", currentCharacter.id, "techniques"],
   });
 
   const {
     updateSpiritDiePool,
     rollSpiritedie
-  } = useCharacterState(character.id);
+  } = useCharacterState(currentCharacter.id);
 
   // Get level-based dice or use override
-  const levelBasedDice = SPIRIT_DIE_PROGRESSION[character.level] || ['d4'];
+  const levelBasedDice = SPIRIT_DIE_PROGRESSION[currentCharacter.level] || ['d4'];
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
   // Original dice should always be level-based unless there's an explicit override
@@ -168,11 +176,11 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
               
               <div>
                 <h1 className="text-2xl font-bold text-spiritual-700 dark:text-spiritual-400">
-                  {character.name}
+                  {currentCharacter.name}
                 </h1>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {character.path} • Level {character.level}
+                    {currentCharacter.path} • Level {currentCharacter.level}
                   </p>
                   <Button
                     onClick={() => setIsLevelEditorOpen(true)}
@@ -261,7 +269,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           isOpen={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
           technique={editingTechnique}
-          characterId={character.id}
+          characterId={currentCharacter.id}
         />
 
         <SpiritDieOverride
@@ -273,7 +281,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
 
         {/* Level Editor Dialog */}
         <LevelEditor
-          character={character}
+          character={currentCharacter}
           isOpen={isLevelEditorOpen}
           onClose={() => setIsLevelEditorOpen(false)}
         />
