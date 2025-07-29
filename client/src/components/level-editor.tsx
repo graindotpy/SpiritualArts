@@ -55,36 +55,28 @@ export default function LevelEditor({ character, isOpen, onClose }: LevelEditorP
       // Update spirit die pool to match new level
       const newLevelDice = SPIRIT_DIE_PROGRESSION[newLevel] || ['d4'];
       
-      // First try to update existing spirit die pool
-      let spiritDieResponse = await fetch(`/api/character/${character.id}/spirit-die-pool`, {
-        method: 'PUT',
+      // Always delete and recreate the spirit die pool to ensure clean state
+      // First delete existing pool
+      await fetch(`/api/character/${character.id}/spirit-die-pool`, {
+        method: 'DELETE'
+      });
+
+      // Create fresh spirit die pool with new level dice
+      const spiritDieResponse = await fetch(`/api/character/${character.id}/spirit-die-pool`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          characterId: character.id,
           currentDice: newLevelDice,
-          overrideDice: null // Reset any override when level changes
+          overrideDice: null
         }),
       });
 
-      // If update failed (404), create a new spirit die pool
-      if (!spiritDieResponse.ok && spiritDieResponse.status === 404) {
-        spiritDieResponse = await fetch(`/api/character/${character.id}/spirit-die-pool`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            characterId: character.id,
-            currentDice: newLevelDice,
-            overrideDice: null
-          }),
-        });
-      }
-
       // Don't fail if spirit die pool operations fail
       if (!spiritDieResponse.ok) {
-        console.warn('Spirit die pool operations failed, but level was updated successfully');
+        console.warn('Spirit die pool creation failed, but level was updated successfully');
       }
 
       // Invalidate character queries to refresh the UI

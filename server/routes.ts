@@ -29,7 +29,7 @@ const upload = multer({
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed!'), false);
+      cb(new Error('Only image files are allowed!'));
     }
   },
   limits: {
@@ -153,6 +153,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update spirit die pool" });
+    }
+  });
+
+  // Delete spirit die pool
+  app.delete("/api/character/:id/spirit-die-pool", async (req, res) => {
+    try {
+      const deleted = await storage.deleteSpiritDiePool(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Spirit die pool not found" });
+      }
+      res.json({ message: "Spirit die pool deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete spirit die pool" });
     }
   });
 

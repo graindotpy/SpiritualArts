@@ -28,6 +28,7 @@ export interface IStorage {
   getSpiritDiePool(characterId: string): Promise<SpiritDiePool | undefined>;
   createSpiritDiePool(pool: InsertSpiritDiePool): Promise<SpiritDiePool>;
   updateSpiritDiePool(characterId: string, pool: Partial<SpiritDiePool>): Promise<SpiritDiePool | undefined>;
+  deleteSpiritDiePool(characterId: string): Promise<boolean>;
 
   // Techniques
   getTechniques(characterId: string): Promise<Technique[]>;
@@ -167,6 +168,13 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  async deleteSpiritDiePool(characterId: string): Promise<boolean> {
+    const existing = Array.from(this.spiritDiePools.values()).find(p => p.characterId === characterId);
+    if (!existing) return false;
+    
+    return this.spiritDiePools.delete(existing.id);
+  }
+
   // Techniques
   async getTechniques(characterId: string): Promise<Technique[]> {
     return Array.from(this.techniques.values()).filter(tech => tech.characterId === characterId && tech.isActive);
@@ -282,6 +290,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(spiritDiePools.characterId, characterId))
       .returning();
     return updated || undefined;
+  }
+
+  async deleteSpiritDiePool(characterId: string): Promise<boolean> {
+    const result = await db
+      .delete(spiritDiePools)
+      .where(eq(spiritDiePools.characterId, characterId));
+    return result.rowCount > 0;
   }
 
   // Techniques
