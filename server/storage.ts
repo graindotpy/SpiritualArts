@@ -1,4 +1,8 @@
 import { 
+  characters,
+  spiritDiePools,
+  techniques,
+  activeEffects,
   type Character, 
   type InsertCharacter,
   type SpiritDiePool,
@@ -7,8 +11,11 @@ import {
   type InsertTechnique,
   type ActiveEffect,
   type InsertActiveEffect,
-  type DieSize
+  type DieSize,
+  SPIRIT_DIE_PROGRESSION
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -230,4 +237,179 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // Characters
+  async getCharacter(id: string): Promise<Character | undefined> {
+    const [character] = await db.select().from(characters).where(eq(characters.id, id));
+    return character || undefined;
+  }
+
+  async createCharacter(character: InsertCharacter): Promise<Character> {
+    const [newCharacter] = await db
+      .insert(characters)
+      .values(character)
+      .returning();
+    return newCharacter;
+  }
+
+  async updateCharacter(id: string, character: Partial<Character>): Promise<Character | undefined> {
+    const [updated] = await db
+      .update(characters)
+      .set(character)
+      .where(eq(characters.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Spirit Die Pools
+  async getSpiritDiePool(characterId: string): Promise<SpiritDiePool | undefined> {
+    const [pool] = await db.select().from(spiritDiePools).where(eq(spiritDiePools.characterId, characterId));
+    return pool || undefined;
+  }
+
+  async createSpiritDiePool(pool: InsertSpiritDiePool): Promise<SpiritDiePool> {
+    const [newPool] = await db
+      .insert(spiritDiePools)
+      .values(pool)
+      .returning();
+    return newPool;
+  }
+
+  async updateSpiritDiePool(characterId: string, pool: Partial<SpiritDiePool>): Promise<SpiritDiePool | undefined> {
+    const [updated] = await db
+      .update(spiritDiePools)
+      .set(pool)
+      .where(eq(spiritDiePools.characterId, characterId))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Techniques
+  async getTechniques(characterId: string): Promise<Technique[]> {
+    return await db.select().from(techniques).where(eq(techniques.characterId, characterId));
+  }
+
+  async getTechnique(id: string): Promise<Technique | undefined> {
+    const [technique] = await db.select().from(techniques).where(eq(techniques.id, id));
+    return technique || undefined;
+  }
+
+  async createTechnique(technique: InsertTechnique): Promise<Technique> {
+    const [newTechnique] = await db
+      .insert(techniques)
+      .values(technique)
+      .returning();
+    return newTechnique;
+  }
+
+  async updateTechnique(id: string, technique: Partial<Technique>): Promise<Technique | undefined> {
+    const [updated] = await db
+      .update(techniques)
+      .set(technique)
+      .where(eq(techniques.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteTechnique(id: string): Promise<boolean> {
+    const [updated] = await db
+      .update(techniques)
+      .set({ isActive: false })
+      .where(eq(techniques.id, id))
+      .returning();
+    return !!updated;
+  }
+
+  // Active Effects
+  async getActiveEffects(characterId: string): Promise<ActiveEffect[]> {
+    return await db.select().from(activeEffects).where(eq(activeEffects.characterId, characterId));
+  }
+
+  async createActiveEffect(effect: InsertActiveEffect): Promise<ActiveEffect> {
+    const [newEffect] = await db
+      .insert(activeEffects)
+      .values(effect)
+      .returning();
+    return newEffect;
+  }
+
+  async updateActiveEffect(id: string, effect: Partial<ActiveEffect>): Promise<ActiveEffect | undefined> {
+    const [updated] = await db
+      .update(activeEffects)
+      .set(effect)
+      .where(eq(activeEffects.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteActiveEffect(id: string): Promise<boolean> {
+    const result = await db.delete(activeEffects).where(eq(activeEffects.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+}
+
+// Initialize database with default character data
+async function initializeDatabase() {
+  try {
+    // Check if R'aan Fames already exists
+    const existingCharacter = await db.select().from(characters).limit(1);
+    
+    if (existingCharacter.length === 0) {
+      console.log("Initializing database with default character...");
+      
+      // Create R'aan Fames character
+      const [character] = await db
+        .insert(characters)
+        .values({
+          name: "R'aan Fames",
+          path: "Path of Gluttony",
+          level: 8
+        })
+        .returning();
+
+      // Create spirit die pool
+      const levelDice = SPIRIT_DIE_PROGRESSION[8] || ['d4'];
+      await db
+        .insert(spiritDiePools)
+        .values({
+          characterId: character.id,
+          currentDice: levelDice,
+          overrideDice: null
+        });
+
+      // Create some sample techniques
+      await db
+        .insert(techniques)
+        .values([
+          {
+            characterId: character.id,
+            name: "Devouring Maw",
+            triggerDescription: "When you successfully hit with a melee attack",
+            spEffects: {
+              1: { effect: "Deal an additional 1d4 necrotic damage", actionType: "action" },
+              2: { effect: "Deal an additional 1d6 necrotic damage and heal for half", actionType: "action" },
+              3: { effect: "Deal an additional 1d8 necrotic damage, heal for half, and gain temporary HP", actionType: "action" }
+            }
+          },
+          {
+            characterId: character.id,
+            name: "Endless Hunger",
+            triggerDescription: "When you reduce a creature to 0 hit points",
+            spEffects: {
+              1: { effect: "Regain 1 SP", actionType: "reaction" },
+              2: { effect: "Regain 2 SP and gain 5 temporary HP", actionType: "reaction" }
+            }
+          }
+        ]);
+
+      console.log("Database initialized successfully!");
+    }
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+  }
+}
+
+export const storage = new DatabaseStorage();
+
+// Initialize on startup
+initializeDatabase();

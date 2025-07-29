@@ -1,19 +1,22 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, type DieSize } from "@shared/schema";
+import { db } from "./db";
+import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, type DieSize } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get character (assume first character for now)
   app.get("/api/character", async (req, res) => {
     try {
-      const characters = Array.from((storage as any).characters.values());
-      if (characters.length === 0) {
+      // For now, we'll get the first character from the database
+      const characterList = await db.select().from(characters).limit(1);
+      if (characterList.length === 0) {
         return res.status(404).json({ message: "No character found" });
       }
-      res.json(characters[0]);
+      res.json(characterList[0]);
     } catch (error) {
+      console.error("Character fetch error:", error);
       res.status(500).json({ message: "Failed to get character" });
     }
   });
