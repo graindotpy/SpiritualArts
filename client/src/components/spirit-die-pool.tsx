@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
+import { Info, RotateCcw } from "lucide-react";
 import SpiritDie from "./spirit-die";
 import type { SpiritDiePool, DieSize } from "@shared/schema";
 
 interface SpiritDiePoolProps {
   pool: SpiritDiePool;
   currentDice: DieSize[];
+  originalDice: DieSize[];
   selectedDieIndex: number | null;
   onDieSelect: (index: number) => void;
+  onDieRestore: (index: number) => void;
 }
 
 export default function SpiritDiePoolComponent({ 
   pool, 
   currentDice, 
+  originalDice,
   selectedDieIndex, 
-  onDieSelect 
+  onDieSelect,
+  onDieRestore
 }: SpiritDiePoolProps) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -29,15 +33,33 @@ export default function SpiritDiePoolComponent({
       </div>
       
       <div className="flex items-center space-x-4">
-        {currentDice.map((dieSize, index) => (
-          <SpiritDie
-            key={index}
-            size={dieSize}
-            isActive={true}
-            isSelected={selectedDieIndex === index}
-            onClick={() => onDieSelect(index)}
-          />
-        ))}
+        {currentDice.map((dieSize, index) => {
+          const originalDie = originalDice[index];
+          const canRestore = originalDie && dieSize !== originalDie;
+          
+          return (
+            <div key={index} className="flex flex-col items-center space-y-1">
+              {canRestore && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onDieRestore(index)}
+                  className="h-6 px-2 text-xs text-gray-500 hover:text-spiritual-600 dark:text-gray-400 dark:hover:text-spiritual-400"
+                  title={`Restore to ${originalDie}`}
+                >
+                  <RotateCcw className="w-3 h-3 mr-1" />
+                  Restore
+                </Button>
+              )}
+              <SpiritDie
+                size={dieSize}
+                isActive={true}
+                isSelected={selectedDieIndex === index}
+                onClick={() => onDieSelect(index)}
+              />
+            </div>
+          );
+        })}
         
         {currentDice.length === 0 && (
           <div className="text-center py-8">

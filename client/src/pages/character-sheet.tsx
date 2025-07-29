@@ -47,6 +47,7 @@ export default function CharacterSheet() {
   const levelBasedDice = character ? SPIRIT_DIE_PROGRESSION[character.level] || ['d4'] : ['d4'];
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
+  const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice;
 
   // Auto-select first die if none selected and dice are available
   if (selectedDieIndex === null && currentDice.length > 0) {
@@ -92,6 +93,22 @@ export default function CharacterSheet() {
 
   const handleDieSelect = (index: number) => {
     setSelectedDieIndex(index);
+  };
+
+  const handleDieRestore = async (index: number) => {
+    if (!character?.id || !spiritDiePool) return;
+    
+    // Create a copy of current dice array
+    const newDice = [...currentDice];
+    
+    // Restore the specific die to its original value
+    if (index < originalDice.length) {
+      newDice[index] = originalDice[index];
+      
+      await updateSpiritDiePool.mutateAsync({
+        currentDice: newDice
+      });
+    }
   };
 
   const handleEditTechnique = (technique: Technique) => {
@@ -208,8 +225,10 @@ export default function CharacterSheet() {
               <SpiritDiePoolComponent 
                 pool={spiritDiePool} 
                 currentDice={currentDice}
+                originalDice={originalDice}
                 selectedDieIndex={selectedDieIndex}
                 onDieSelect={handleDieSelect}
+                onDieRestore={handleDieRestore}
               />
             )}
           </CardContent>
