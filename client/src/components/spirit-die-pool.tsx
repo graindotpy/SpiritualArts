@@ -5,12 +5,12 @@ import type { SpiritDiePool, DieSize } from "@shared/schema";
 
 interface SpiritDiePoolProps {
   pool: SpiritDiePool;
+  currentDice: DieSize[];
   onLongRest: () => void;
   isLoading: boolean;
 }
 
-export default function SpiritDiePoolComponent({ pool, onLongRest, isLoading }: SpiritDiePoolProps) {
-  const currentDice = pool.currentDice as DieSize[];
+export default function SpiritDiePoolComponent({ pool, currentDice, onLongRest, isLoading }: SpiritDiePoolProps) {
 
   return (
     <div className="mt-6 pt-6 border-t border-gray-200">

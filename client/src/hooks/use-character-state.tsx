@@ -184,8 +184,32 @@ export function useCharacterState(characterId: string | undefined) {
     },
   });
 
+  const updateCharacterLevel = useMutation({
+    mutationFn: async (data: { level: number }) => {
+      if (!characterId) throw new Error("No character ID");
+      const response = await apiRequest("PUT", `/api/character/${characterId}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/character"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/character", characterId, "spirit-die-pool"] });
+      toast({
+        title: "Success",
+        description: "Character level updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update character level",
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     updateSpiritDiePool,
+    updateCharacterLevel,
     rollSpiritedie,
     longRest,
     createTechnique,

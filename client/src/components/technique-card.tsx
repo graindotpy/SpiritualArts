@@ -34,8 +34,10 @@ export default function TechniqueCard({
   }
 
   const handleWheel = (e: React.WheelEvent) => {
+    if (!isHovered || spOptions.length === 0) return;
+    
     e.preventDefault();
-    if (spOptions.length === 0) return;
+    e.stopPropagation();
 
     const currentIndex = spOptions.indexOf(currentSP);
     let newIndex = currentIndex;

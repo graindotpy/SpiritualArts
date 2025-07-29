@@ -61,9 +61,8 @@ export class MemStorage implements IStorage {
 
     await this.createSpiritDiePool({
       characterId: character.id,
-      diceCount: 2,
-      dieSize: "d4",
-      currentDice: ["d4", "d4"]
+      currentDice: ["d4", "d4"],
+      overrideDice: null
     });
 
     // Create default techniques from the PDF

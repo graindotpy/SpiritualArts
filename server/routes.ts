@@ -48,6 +48,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update character level
+  app.put("/api/character/:id", async (req, res) => {
+    try {
+      const { level } = req.body;
+      if (typeof level !== 'number' || level < 1 || level > 20) {
+        return res.status(400).json({ message: "Level must be between 1 and 20" });
+      }
+      const updated = await storage.updateCharacter(req.params.id, { level });
+      if (!updated) {
+        return res.status(404).json({ message: "Character not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update character" });
+    }
+  });
+
   // Roll spirit die
   app.post("/api/character/:id/roll", async (req, res) => {
     try {
@@ -115,7 +132,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Spirit die pool not found" });
       }
 
-      const restoredDice = Array(pool.diceCount).fill(pool.dieSize);
+      // Get the character to determine level-based dice
+      const character = await storage.getCharacter(req.params.id);
+      if (!character) {
+        return res.status(404).json({ message: "Character not found" });
+      }
+
+      const { SPIRIT_DIE_PROGRESSION } = await import("@shared/schema");
+      const baseDice = SPIRIT_DIE_PROGRESSION[character.level] || ['d4'];
+      const restoredDice = pool.overrideDice ? (pool.overrideDice as any[]) : baseDice;
       const updated = await storage.updateSpiritDiePool(req.params.id, { currentDice: restoredDice });
       
       res.json(updated);

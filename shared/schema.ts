@@ -13,9 +13,8 @@ export const characters = pgTable("characters", {
 export const spiritDiePools = pgTable("spirit_die_pools", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   characterId: varchar("character_id").notNull(),
-  diceCount: integer("dice_count").notNull(),
-  dieSize: text("die_size").notNull(), // d4, d6, d8, d10, d12
   currentDice: jsonb("current_dice").notNull(), // Array of current die sizes
+  overrideDice: jsonb("override_dice"), // Manual override for dice pool
 });
 
 export const techniques = pgTable("techniques", {
@@ -79,3 +78,27 @@ export interface RollResult {
   success: boolean;
   newDicePool: DieSize[];
 }
+
+// Spirit die progression by level
+export const SPIRIT_DIE_PROGRESSION: Record<number, DieSize[]> = {
+  1: ['d4'],
+  2: ['d4'],
+  3: ['d4', 'd4'],
+  4: ['d4', 'd4'],
+  5: ['d4', 'd4'],
+  6: ['d4', 'd6'],
+  7: ['d4', 'd6'],
+  8: ['d6', 'd6'],
+  9: ['d6', 'd6'],
+  10: ['d6', 'd8'],
+  11: ['d6', 'd8'],
+  12: ['d8', 'd8'],
+  13: ['d8', 'd8'],
+  14: ['d8', 'd10'],
+  15: ['d8', 'd10'],
+  16: ['d10', 'd10'],
+  17: ['d10', 'd10'],
+  18: ['d10', 'd12'],
+  19: ['d10', 'd12'],
+  20: ['d12', 'd12']
+};
