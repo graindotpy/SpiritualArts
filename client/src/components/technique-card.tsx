@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +52,22 @@ export default function TechniqueCard({
     setCurrentSP(newSP);
     onSelect(technique.id, newSP);
   };
+
+  // Prevent page scrolling when hovering over technique card
+  useEffect(() => {
+    if (isHovered) {
+      // Disable page scrolling
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Re-enable page scrolling
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to ensure scrolling is re-enabled
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isHovered]);
 
   const handleClick = () => {
     if (currentSP > 0) {
