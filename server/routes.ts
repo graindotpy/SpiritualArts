@@ -122,6 +122,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create spirit die pool
+  app.post("/api/character/:id/spirit-die-pool", async (req, res) => {
+    try {
+      const validatedData = insertSpiritDiePoolSchema.parse({
+        ...req.body,
+        characterId: req.params.id
+      });
+      const pool = await storage.createSpiritDiePool(validatedData);
+      res.json(pool);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create spirit die pool" });
+    }
+  });
+
   // Update spirit die pool
   app.put("/api/character/:id/spirit-die-pool", async (req, res) => {
     try {

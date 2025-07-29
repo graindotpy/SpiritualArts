@@ -45,6 +45,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const levelBasedDice = SPIRIT_DIE_PROGRESSION[character.level] || ['d4'];
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
+  // Original dice should always be level-based unless there's an explicit override
   const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice as DieSize[];
 
   // Auto-select first die if none selected and dice are available
