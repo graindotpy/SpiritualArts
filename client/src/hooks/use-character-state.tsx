@@ -54,27 +54,7 @@ export function useCharacterState(characterId: string | undefined) {
     },
   });
 
-  const longRest = useMutation({
-    mutationFn: async () => {
-      if (!characterId) throw new Error("No character ID");
-      const response = await apiRequest("POST", `/api/character/${characterId}/long-rest`, {});
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/character", characterId, "spirit-die-pool"] });
-      toast({
-        title: "Long Rest Complete",
-        description: "All spirit dice have been restored",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to complete long rest",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const createTechnique = useMutation({
     mutationFn: async (data: Omit<InsertTechnique, 'characterId'>) => {
@@ -211,7 +191,6 @@ export function useCharacterState(characterId: string | undefined) {
     updateSpiritDiePool,
     updateCharacterLevel,
     rollSpiritedie,
-    longRest,
     createTechnique,
     updateTechnique,
     deleteTechnique,

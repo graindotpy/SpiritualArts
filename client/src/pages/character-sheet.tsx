@@ -39,8 +39,7 @@ export default function CharacterSheet() {
   const {
     updateSpiritDiePool,
     updateCharacterLevel,
-    rollSpiritedie,
-    longRest
+    rollSpiritedie
   } = useCharacterState(character?.id);
 
   // Get level-based dice or use override
@@ -186,8 +185,6 @@ export default function CharacterSheet() {
               <SpiritDiePoolComponent 
                 pool={spiritDiePool} 
                 currentDice={currentDice}
-                onLongRest={() => longRest.mutateAsync()}
-                isLoading={longRest.isPending}
               />
             )}
           </CardContent>
