@@ -1,11 +1,34 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { InsertTechnique, InsertSpiritDiePool, InsertActiveEffect } from "@shared/schema";
+import type { InsertTechnique, InsertSpiritDiePool, InsertActiveEffect, Character } from "@shared/schema";
 
 export function useCharacterState(characterId: string | undefined) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const updateCharacter = useMutation({
+    mutationFn: async (data: Partial<Character>) => {
+      if (!characterId) throw new Error("No character ID");
+      const response = await apiRequest("PUT", `/api/character/${characterId}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/character"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/character", characterId, "spirit-die-pool"] });
+      toast({
+        title: "Success",
+        description: "Character updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update character",
+        variant: "destructive",
+      });
+    },
+  });
 
   const updateSpiritDiePool = useMutation({
     mutationFn: async (data: Partial<InsertSpiritDiePool>) => {
@@ -188,6 +211,7 @@ export function useCharacterState(characterId: string | undefined) {
   });
 
   return {
+    updateCharacter,
     updateSpiritDiePool,
     updateCharacterLevel,
     rollSpiritedie,

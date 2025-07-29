@@ -21,6 +21,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create a new character
+  app.post("/api/character", async (req, res) => {
+    try {
+      const { name, path, level = 1 } = req.body;
+      
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name is required" });
+      }
+      
+      if (!path || typeof path !== 'string' || path.trim().length === 0) {
+        return res.status(400).json({ message: "Path is required" });
+      }
+      
+      if (typeof level !== 'number' || level < 1 || level > 20) {
+        return res.status(400).json({ message: "Level must be between 1 and 20" });
+      }
+      
+      const character = await storage.createCharacter({
+        name: name.trim(),
+        path: path.trim(),
+        level
+      });
+      
+      res.json(character);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create character" });
+    }
+  });
+
   // Get spirit die pool
   app.get("/api/character/:id/spirit-die-pool", async (req, res) => {
     try {
@@ -51,14 +80,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update character level
+  // Update character (level, name, path)
   app.put("/api/character/:id", async (req, res) => {
     try {
-      const { level } = req.body;
-      if (typeof level !== 'number' || level < 1 || level > 20) {
-        return res.status(400).json({ message: "Level must be between 1 and 20" });
+      const { level, name, path } = req.body;
+      const updateData: any = {};
+      
+      if (level !== undefined) {
+        if (typeof level !== 'number' || level < 1 || level > 20) {
+          return res.status(400).json({ message: "Level must be between 1 and 20" });
+        }
+        updateData.level = level;
       }
-      const updated = await storage.updateCharacter(req.params.id, { level });
+      
+      if (name !== undefined) {
+        if (typeof name !== 'string' || name.trim().length === 0) {
+          return res.status(400).json({ message: "Name must be a non-empty string" });
+        }
+        updateData.name = name.trim();
+      }
+      
+      if (path !== undefined) {
+        if (typeof path !== 'string' || path.trim().length === 0) {
+          return res.status(400).json({ message: "Path must be a non-empty string" });
+        }
+        updateData.path = path.trim();
+      }
+      
+      const updated = await storage.updateCharacter(req.params.id, updateData);
       if (!updated) {
         return res.status(404).json({ message: "Character not found" });
       }
