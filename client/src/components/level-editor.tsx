@@ -7,6 +7,7 @@ import { TrendingUp, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import type { Character } from "@shared/schema";
+import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 
 interface LevelEditorProps {
   character: Character;
@@ -51,13 +52,32 @@ export default function LevelEditor({ character, isOpen, onClose }: LevelEditorP
         throw new Error('Failed to update level');
       }
 
+      // Update spirit die pool to match new level
+      const newLevelDice = SPIRIT_DIE_PROGRESSION[newLevel] || ['d4'];
+      const spiritDieResponse = await fetch(`/api/character/${character.id}/spirit-die-pool`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentDice: newLevelDice,
+          overrideDice: null // Reset any override when level changes
+        }),
+      });
+
+      // Don't fail if spirit die pool update fails (it might not exist yet)
+      if (!spiritDieResponse.ok) {
+        console.warn('Spirit die pool update failed, but level was updated successfully');
+      }
+
       // Invalidate character queries to refresh the UI
       await queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/character", character.id] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/character", character.id, "spirit-die-pool"] });
 
       toast({
         title: "Level updated",
-        description: `${character.name} is now level ${newLevel}`,
+        description: `${character.name} is now level ${newLevel} with updated spirit dice`,
       });
 
       onClose();

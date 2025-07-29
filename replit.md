@@ -51,6 +51,8 @@ The application follows a clear separation between frontend and backend:
 - Small "Edit" button next to level display in character header
 - Dialog interface for updating character level (1-20) with validation
 - Current level display and input field for new level
+- **Automatic Spirit Die Pool Updates** - Spirit dice automatically update to match new level
+- Resets any custom dice overrides when level changes
 - Automatic character cache invalidation for real-time updates
 - Toast notifications for successful updates and error handling
 
