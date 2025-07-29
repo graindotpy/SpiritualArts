@@ -4,6 +4,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { db } from "./db";
 import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, type DieSize } from "@shared/schema";
@@ -37,7 +38,45 @@ const upload = multer({
   }
 });
 
+// WebSocket clients store
+const wsClients = new Set<WebSocket>();
+
+// Broadcast function for spirit die rolls
+function broadcastSpiriteRoll(rollData: any) {
+  const message = JSON.stringify({
+    type: 'spirit_die_roll',
+    data: rollData
+  });
+  
+  wsClients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Create HTTP server
+  const httpServer = createServer(app);
+  
+  // Create WebSocket server on same port with distinct path
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  wss.on('connection', (ws) => {
+    console.log('WebSocket client connected');
+    wsClients.add(ws);
+    
+    ws.on('close', () => {
+      console.log('WebSocket client disconnected');
+      wsClients.delete(ws);
+    });
+    
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      wsClients.delete(ws);
+    });
+  });
+  
   // Serve uploaded portraits
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   // Get all characters
@@ -337,18 +376,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update the pool
       await storage.updateSpiritDiePool(req.params.id, { currentDice: newDicePool });
 
+      // Get character info for broadcast
+      const character = await storage.getCharacter(req.params.id);
+      
+      const rollResult = {
+        value: rollValue,
+        success,
+        newDicePool,
+        dieRolled: dieSize
+      };
+
+      // Broadcast roll to all connected clients
+      if (character) {
+        const rollBroadcast = {
+          character: {
+            id: character.id,
+            name: character.name,
+            path: character.path,
+            level: character.level,
+            portraitUrl: character.portraitUrl
+          },
+          roll: {
+            spInvestment,
+            dieSize,
+            dieIndex,
+            value: rollValue,
+            success,
+            timestamp: new Date().toISOString()
+          }
+        };
+        
+        broadcastSpiriteRoll(rollBroadcast);
+      }
+
       console.log(`Roll result for ${spInvestment} SP using die ${dieIndex} (${dieSize}):`, {
         value: rollValue,
         success,
         newDicePool
       });
 
-      res.json({
-        value: rollValue,
-        success,
-        newDicePool,
-        dieRolled: dieSize
-      });
+      res.json(rollResult);
     } catch (error) {
       console.error("Error rolling die:", error);
       res.status(500).json({ message: "Failed to roll die" });
@@ -477,6 +544,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
   return httpServer;
 }

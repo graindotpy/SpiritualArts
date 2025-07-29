@@ -12,6 +12,8 @@ import EditableCharacterHeader from "@/components/editable-character-header";
 import LevelEditor from "@/components/level-editor";
 import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
+import { useWebSocket } from "@/hooks/use-websocket";
+import SpiritRollNotification from "@/components/spirit-roll-notification";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
 
@@ -27,6 +29,9 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
   const [isLevelEditorOpen, setIsLevelEditorOpen] = useState(false);
+
+  // WebSocket for real-time roll notifications
+  const { isConnected, lastRollBroadcast } = useWebSocket();
 
   // Fetch fresh character data to ensure we have the latest level
   const { data: freshCharacter } = useQuery<Character>({
@@ -287,6 +292,12 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
         />
 
       </main>
+
+      {/* Real-time Spirit Die Roll Notifications */}
+      <SpiritRollNotification 
+        rollData={lastRollBroadcast}
+        currentCharacterId={currentCharacter.id}
+      />
     </div>
   );
 }

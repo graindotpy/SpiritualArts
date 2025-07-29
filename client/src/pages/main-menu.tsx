@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Moon, Sun, User, Camera } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { useWebSocket } from "@/hooks/use-websocket";
 import CharacterCreator from "@/components/character-creator";
 import PortraitUpload from "@/components/portrait-upload";
+import SpiritRollNotification from "@/components/spirit-roll-notification";
 import type { Character } from "@shared/schema";
 
 interface MainMenuProps {
@@ -16,6 +18,9 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
   const { theme, toggleTheme } = useTheme();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
   const [portraitUploadId, setPortraitUploadId] = useState<string | null>(null);
+
+  // WebSocket for real-time roll notifications
+  const { isConnected, lastRollBroadcast } = useWebSocket();
 
   const { data: characters = [] } = useQuery<Character[]>({
     queryKey: ["/api/characters"],
@@ -172,6 +177,12 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
           onClose={() => setPortraitUploadId(null)}
         />
       )}
+
+      {/* Real-time Spirit Die Roll Notifications */}
+      <SpiritRollNotification 
+        rollData={lastRollBroadcast}
+        currentCharacterId={undefined} // Show all rolls on main menu
+      />
     </div>
   );
 }
