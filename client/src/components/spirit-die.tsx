@@ -19,8 +19,9 @@ export default function SpiritDie({ size, isActive, isSelected, onClick, classNa
           isActive 
             ? cn(
                 "bg-gradient-to-br from-spiritual-400 to-spiritual-600 text-white border-spiritual-300",
-                "dark:from-spiritual-500 dark:to-spiritual-700 dark:border-spiritual-400",
-                "hover:scale-105 hover:shadow-xl"
+                "dark:from-spiritual-500 dark:to-spiritual-700 dark:border-spiritual-400 dark:text-white",
+                "hover:scale-105 hover:shadow-xl",
+                "[text-shadow:_0_1px_2px_rgb(0_0_0_/_0.8)]"
               )
             : cn(
                 "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-100 border-gray-400",
