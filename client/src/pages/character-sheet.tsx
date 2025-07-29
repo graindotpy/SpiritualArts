@@ -2,49 +2,45 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Home, Moon, Sun } from "lucide-react";
 import SpiritDiePoolComponent from "@/components/spirit-die-pool";
 import TechniqueCard from "@/components/technique-card";
 import DieRoller from "@/components/die-roller";
 import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import EditableCharacterHeader from "@/components/editable-character-header";
-import CharacterCreator from "@/components/character-creator";
-import CharacterSelector from "@/components/character-selector";
+import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
 
-export default function CharacterSheet() {
+interface CharacterSheetProps {
+  character: Character;
+  onReturnToMenu: () => void;
+}
+
+export default function CharacterSheet({ character, onReturnToMenu }: CharacterSheetProps) {
+  const { theme, toggleTheme } = useTheme();
   const [selectedDieIndex, setSelectedDieIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
-  const [isCreatorOpen, setIsCreatorOpen] = useState(false);
-  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-  const [currentCharacterId, setCurrentCharacterId] = useState<string | null>(null);
-
-  const { data: character } = useQuery<Character>({
-    queryKey: currentCharacterId ? ["/api/character", currentCharacterId] : ["/api/character"],
-  });
 
   const { data: spiritDiePool } = useQuery<SpiritDiePool>({
-    queryKey: ["/api/character", character?.id, "spirit-die-pool"],
-    enabled: !!character?.id,
+    queryKey: ["/api/character", character.id, "spirit-die-pool"],
   });
 
   const { data: techniques = [] } = useQuery<Technique[]>({
-    queryKey: ["/api/character", character?.id, "techniques"],
-    enabled: !!character?.id,
+    queryKey: ["/api/character", character.id, "techniques"],
   });
 
   const {
     updateSpiritDiePool,
     rollSpiritedie
-  } = useCharacterState(character?.id);
+  } = useCharacterState(character.id);
 
   // Get level-based dice or use override
-  const levelBasedDice = character ? SPIRIT_DIE_PROGRESSION[character.level] || ['d4'] : ['d4'];
+  const levelBasedDice = SPIRIT_DIE_PROGRESSION[character.level] || ['d4'];
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
   const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice as DieSize[];
@@ -76,24 +72,9 @@ export default function CharacterSheet() {
     };
   }, []);
 
-  const handleNewCharacter = () => {
-    setIsCreatorOpen(true);
-  };
 
-  const handleCharacterCreated = (newCharacter: Character) => {
-    setCurrentCharacterId(newCharacter.id);
-  };
-
-  const handleSwitchCharacter = () => {
-    setIsSelectorOpen(true);
-  };
-
-  const handleCharacterSelect = (selectedCharacter: Character) => {
-    setCurrentCharacterId(selectedCharacter.id);
-  };
 
   const handleDiceOverride = async (dice: DieSize[]) => {
-    if (!character?.id) return;
     await updateSpiritDiePool.mutateAsync({
       currentDice: dice,
       overrideDice: dice
@@ -101,7 +82,6 @@ export default function CharacterSheet() {
   };
 
   const handleResetToLevel = async () => {
-    if (!character?.id) return;
     const levelDice = SPIRIT_DIE_PROGRESSION[character.level] || ['d4'];
     await updateSpiritDiePool.mutateAsync({
       currentDice: levelDice,
@@ -124,8 +104,6 @@ export default function CharacterSheet() {
   };
 
   const handleDieRestore = async (index: number) => {
-    if (!character?.id || !spiritDiePool) return;
-    
     // Create a copy of current dice array
     const newDice = [...currentDice];
     
@@ -140,8 +118,6 @@ export default function CharacterSheet() {
   };
 
   const handleRestoreAll = async () => {
-    if (!character?.id) return;
-    
     await updateSpiritDiePool.mutateAsync({
       currentDice: originalDice
     });
@@ -175,11 +151,37 @@ export default function CharacterSheet() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <EditableCharacterHeader 
-            character={character} 
-            onNewCharacter={handleNewCharacter}
-            onSwitchCharacter={handleSwitchCharacter}
-          />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={onReturnToMenu}
+                variant="outline"
+                size="sm"
+                className="flex items-center"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Main Menu
+              </Button>
+              
+              <div>
+                <h1 className="text-2xl font-bold text-spiritual-700 dark:text-spiritual-400">
+                  {character.name}
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {character.path} • Level {character.level}
+                </p>
+              </div>
+            </div>
+            
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="sm"
+              className="p-2"
+            >
+              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -221,6 +223,7 @@ export default function CharacterSheet() {
                 <TechniqueCard
                   key={technique.id}
                   technique={technique}
+                  isSelected={false}
                   onSelect={handleTechniqueSelect}
                   onEdit={() => handleEditTechnique(technique)}
                 />
@@ -254,19 +257,7 @@ export default function CharacterSheet() {
           onSave={handleDiceOverride}
         />
 
-        <CharacterCreator
-          isOpen={isCreatorOpen}
-          onClose={() => setIsCreatorOpen(false)}
-          onCharacterCreated={handleCharacterCreated}
-        />
 
-        <CharacterSelector
-          isOpen={isSelectorOpen}
-          onClose={() => setIsSelectorOpen(false)}
-          onCharacterSelect={handleCharacterSelect}
-          onNewCharacter={handleNewCharacter}
-          currentCharacterId={character?.id}
-        />
       </main>
     </div>
   );
