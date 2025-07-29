@@ -32,7 +32,7 @@ The application follows a clear separation between frontend and backend:
 - Added camera icon overlay on character cards for easy portrait management
 - Portraits are stored in `/uploads/portraits/` directory and served statically
 - Automatic cleanup of old portrait files when updating or deleting
-- **NEW: Advanced Image Crop Editor** - Drag and zoom controls for perfect portrait positioning
+- **Advanced Image Crop Editor** - Drag and zoom controls for perfect portrait positioning
   - Interactive canvas-based editor with circular crop preview
   - Zoom slider for precise image scaling (0.2x to 3x)
   - Drag functionality to position image within crop area
@@ -47,7 +47,7 @@ The application follows a clear separation between frontend and backend:
 - Proper routing between main menu (/) and character sheets (/character/:id)
 
 ### Level Management System
-- **NEW: Level Editor Component** - Edit character levels directly from character sheet
+- **Level Editor Component** - Edit character levels directly from character sheet
 - Small "Edit" button next to level display in character header
 - Dialog interface for updating character level (1-20) with validation
 - Current level display and input field for new level
@@ -55,6 +55,16 @@ The application follows a clear separation between frontend and backend:
 - Resets any custom dice overrides when level changes
 - Automatic character cache invalidation for real-time updates
 - Toast notifications for successful updates and error handling
+
+### Data Synchronization Fix (January 29, 2025)
+- **RESOLVED: Character Level Display Bug** - Fixed stale character data in character sheet
+- Implemented fresh character data fetching with separate API query
+- Character level now updates immediately in header after level changes
+- **RESOLVED: Restore Button Bug** - Fixed incorrect restore button appearance after level changes
+- Enhanced level editor to delete/recreate spirit die pools on level changes
+- Added DELETE route and storage methods for spirit die pools
+- Spirit dice now properly recognize new level-based dice as "original" dice
+- Restore buttons only appear when dice have been legitimately reduced by failed technique rolls
 
 ## Key Components
 
