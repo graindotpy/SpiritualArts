@@ -21,9 +21,8 @@ export const techniques = pgTable("techniques", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   characterId: varchar("character_id").notNull(),
   name: text("name").notNull(),
-  triggerType: text("trigger_type").notNull(), // action, bonus, reaction
   triggerDescription: text("trigger_description").notNull(),
-  spEffects: jsonb("sp_effects").notNull(), // Object mapping SP amounts to effects
+  spEffects: jsonb("sp_effects").notNull(), // Object mapping SP amounts to { effect, actionType }
   isActive: boolean("is_active").notNull().default(true),
 });
 
@@ -70,7 +69,10 @@ export type DieSize = 'd4' | 'd6' | 'd8' | 'd10' | 'd12';
 export type TriggerType = 'action' | 'bonus' | 'reaction';
 
 export interface SPEffect {
-  [spAmount: number]: string;
+  [spAmount: number]: {
+    effect: string;
+    actionType: TriggerType;
+  };
 }
 
 export interface RollResult {

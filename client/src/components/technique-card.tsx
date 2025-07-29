@@ -120,9 +120,11 @@ export default function TechniqueCard({
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-spiritual-600">
               {technique.name}
             </h4>
-            <Badge className={getTriggerColor(technique.triggerType)}>
-              {formatTriggerType(technique.triggerType)}
-            </Badge>
+            {currentSP > 0 && spEffects[currentSP] && (
+              <Badge className={getTriggerColor(spEffects[currentSP].actionType)}>
+                {formatTriggerType(spEffects[currentSP].actionType)}
+              </Badge>
+            )}
             {isHovered && currentSP > 0 && (
               <Badge className="bg-spiritual-100 text-spiritual-800">
                 {currentSP} SP
@@ -141,7 +143,7 @@ export default function TechniqueCard({
                 Effect ({currentSP} SP Investment):
               </h5>
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                {spEffects[currentSP]}
+                {spEffects[currentSP].effect}
               </p>
             </div>
           )}

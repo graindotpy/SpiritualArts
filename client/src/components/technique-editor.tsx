@@ -20,6 +20,7 @@ interface TechniqueEditorProps {
 interface SPEffectEntry {
   sp: number;
   effect: string;
+  actionType: TriggerType;
   enabled: boolean;
 }
 
@@ -30,7 +31,6 @@ export default function TechniqueEditor({
   characterId 
 }: TechniqueEditorProps) {
   const [name, setName] = useState("");
-  const [triggerType, setTriggerType] = useState<TriggerType>("action");
   const [triggerDescription, setTriggerDescription] = useState("");
   const [spEffects, setSPEffects] = useState<SPEffectEntry[]>([]);
 
@@ -40,28 +40,27 @@ export default function TechniqueEditor({
   useEffect(() => {
     if (technique) {
       setName(technique.name);
-      setTriggerType(technique.triggerType as TriggerType);
       setTriggerDescription(technique.triggerDescription);
       
       const effects = technique.spEffects as SPEffect;
-      const entries: SPEffectEntry[] = Object.entries(effects).map(([sp, effect]) => ({
+      const entries: SPEffectEntry[] = Object.entries(effects).map(([sp, effectData]) => ({
         sp: parseInt(sp),
-        effect,
+        effect: effectData.effect,
+        actionType: effectData.actionType,
         enabled: true
       }));
       setSPEffects(entries.sort((a, b) => a.sp - b.sp));
     } else {
       // Reset form for new technique
       setName("");
-      setTriggerType("action");
       setTriggerDescription("");
-      setSPEffects([{ sp: 1, effect: "", enabled: true }]);
+      setSPEffects([{ sp: 1, effect: "", actionType: "action", enabled: true }]);
     }
   }, [technique]);
 
   const handleAddSPLevel = () => {
     const maxSP = spEffects.length > 0 ? Math.max(...spEffects.map(e => e.sp)) : 0;
-    setSPEffects([...spEffects, { sp: maxSP + 1, effect: "", enabled: true }]);
+    setSPEffects([...spEffects, { sp: maxSP + 1, effect: "", actionType: "action", enabled: true }]);
   };
 
   const handleRemoveSPLevel = (index: number) => {
@@ -81,12 +80,14 @@ export default function TechniqueEditor({
     spEffects
       .filter(entry => entry.enabled && entry.effect.trim())
       .forEach(entry => {
-        spEffectsObj[entry.sp] = entry.effect;
+        spEffectsObj[entry.sp] = {
+          effect: entry.effect,
+          actionType: entry.actionType
+        };
       });
 
     const techniqueData = {
       name,
-      triggerType,
       triggerDescription,
       spEffects: spEffectsObj
     };
@@ -124,19 +125,7 @@ export default function TechniqueEditor({
             />
           </div>
           
-          <div>
-            <Label htmlFor="triggerType">Trigger Type</Label>
-            <Select value={triggerType} onValueChange={(value: TriggerType) => setTriggerType(value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="action">Action</SelectItem>
-                <SelectItem value="bonus">Bonus Action</SelectItem>
-                <SelectItem value="reaction">Reaction</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Trigger type is now defined at SP level */}
           
           <div>
             <Label htmlFor="triggerDescription">Trigger Description</Label>
@@ -187,13 +176,32 @@ export default function TechniqueEditor({
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <Textarea
-                    value={entry.effect}
-                    onChange={(e) => handleSPEffectChange(index, 'effect', e.target.value)}
-                    placeholder="Describe the effect at this SP level"
-                    rows={2}
-                    disabled={!entry.enabled}
-                  />
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm">Action Type</Label>
+                      <Select 
+                        value={entry.actionType} 
+                        onValueChange={(value: TriggerType) => handleSPEffectChange(index, 'actionType', value)}
+                        disabled={!entry.enabled}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="action">Action</SelectItem>
+                          <SelectItem value="bonus">Bonus Action</SelectItem>
+                          <SelectItem value="reaction">Reaction</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Textarea
+                      value={entry.effect}
+                      onChange={(e) => handleSPEffectChange(index, 'effect', e.target.value)}
+                      placeholder="Describe the effect at this SP level"
+                      rows={2}
+                      disabled={!entry.enabled}
+                    />
+                  </div>
                 </div>
               ))}
               
