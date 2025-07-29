@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Moon, Sun, User } from "lucide-react";
+import { Plus, Moon, Sun, User, Camera } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import CharacterCreator from "@/components/character-creator";
+import PortraitUpload from "@/components/portrait-upload";
 import type { Character } from "@shared/schema";
 
 interface MainMenuProps {
@@ -14,6 +15,7 @@ interface MainMenuProps {
 export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
   const { theme, toggleTheme } = useTheme();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [portraitUploadId, setPortraitUploadId] = useState<string | null>(null);
 
   const { data: characters = [] } = useQuery<Character[]>({
     queryKey: ["/api/characters"],
@@ -70,8 +72,29 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
             >
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-spiritual-100 dark:bg-spiritual-900 rounded-full flex items-center justify-center mr-4">
-                    <User className="w-6 h-6 text-spiritual-600 dark:text-spiritual-400" />
+                  <div className="relative mr-4">
+                    <div className="w-12 h-12 bg-spiritual-100 dark:bg-spiritual-900 rounded-full flex items-center justify-center overflow-hidden">
+                      {character.portraitUrl ? (
+                        <img
+                          src={character.portraitUrl}
+                          alt={character.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-6 h-6 text-spiritual-600 dark:text-spiritual-400" />
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="absolute -top-1 -right-1 w-6 h-6 p-0 rounded-full bg-white dark:bg-gray-800 shadow-sm border"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPortraitUploadId(character.id);
+                      }}
+                    >
+                      <Camera className="w-3 h-3" />
+                    </Button>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -139,6 +162,16 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
         onClose={() => setIsCreatorOpen(false)}
         onCharacterCreated={handleCharacterCreated}
       />
+
+      {/* Portrait Upload Dialog */}
+      {portraitUploadId && (
+        <PortraitUpload
+          characterId={portraitUploadId}
+          currentPortraitUrl={characters.find(c => c.id === portraitUploadId)?.portraitUrl}
+          isOpen={true}
+          onClose={() => setPortraitUploadId(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,11 +1,45 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { storage } from "./storage";
 import { db } from "./db";
 import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, type DieSize } from "@shared/schema";
 import { z } from "zod";
 
+// Configure multer for portrait uploads
+const uploadsDir = path.join(process.cwd(), 'uploads', 'portraits');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'portrait-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve uploaded portraits
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   // Get all characters
   app.get("/api/characters", async (req, res) => {
     try {
@@ -139,6 +173,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updated);
     } catch (error) {
       res.status(500).json({ message: "Failed to update character" });
+    }
+  });
+
+  // Upload character portrait
+  app.post("/api/character/:id/portrait", upload.single('portrait'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No portrait file provided" });
+      }
+
+      const portraitUrl = `/uploads/portraits/${req.file.filename}`;
+      const updated = await storage.updateCharacter(req.params.id, { portraitUrl });
+      
+      if (!updated) {
+        // Clean up uploaded file if character update fails
+        fs.unlinkSync(req.file.path);
+        return res.status(404).json({ message: "Character not found" });
+      }
+
+      res.json({ portraitUrl });
+    } catch (error) {
+      // Clean up uploaded file on error
+      if (req.file) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (cleanupError) {
+          console.error("Failed to cleanup uploaded file:", cleanupError);
+        }
+      }
+      console.error("Portrait upload error:", error);
+      res.status(500).json({ message: "Failed to upload portrait" });
+    }
+  });
+
+  // Delete character portrait
+  app.delete("/api/character/:id/portrait", async (req, res) => {
+    try {
+      const character = await storage.getCharacter(req.params.id);
+      if (!character) {
+        return res.status(404).json({ message: "Character not found" });
+      }
+
+      // Delete the old portrait file if it exists
+      if (character.portraitUrl) {
+        const oldFilePath = path.join(process.cwd(), character.portraitUrl);
+        try {
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        } catch (fileError) {
+          console.error("Failed to delete old portrait file:", fileError);
+        }
+      }
+
+      const updated = await storage.updateCharacter(req.params.id, { portraitUrl: null });
+      res.json(updated);
+    } catch (error) {
+      console.error("Portrait delete error:", error);
+      res.status(500).json({ message: "Failed to delete portrait" });
     }
   });
 

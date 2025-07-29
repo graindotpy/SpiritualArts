@@ -8,6 +8,7 @@ export const characters = pgTable("characters", {
   name: text("name").notNull(),
   path: text("path").notNull(),
   level: integer("level").notNull().default(3),
+  portraitUrl: text("portrait_url"),
 });
 
 export const spiritDiePools = pgTable("spirit_die_pools", {

@@ -23,11 +23,28 @@ The application follows a clear separation between frontend and backend:
 - **UI**: shadcn/ui components with Tailwind CSS
 - **State Management**: TanStack Query for server state, React hooks for local state
 
+## Recent Changes (January 2025)
+
+### Portrait Upload System
+- Added `portraitUrl` field to characters schema for image storage
+- Implemented multer-based file upload with 5MB limit and image validation
+- Created portrait upload component with preview, upload, and delete functionality
+- Added camera icon overlay on character cards for easy portrait management
+- Portraits are stored in `/uploads/portraits/` directory and served statically
+- Automatic cleanup of old portrait files when updating or deleting
+
+### Main Menu Navigation
+- Replaced character switching with dedicated main menu system
+- Main menu displays all characters in a card grid layout with portraits
+- Added theme toggle (light/dark mode) across the application
+- Character sheets now have "Main Menu" button instead of character selector
+- Proper routing between main menu (/) and character sheets (/character/:id)
+
 ## Key Components
 
 ### Database Schema (`shared/schema.ts`)
 Defines four main entities:
-- **Characters**: Basic character information (name, path, level)
+- **Characters**: Basic character information (name, path, level, portrait)
 - **Spirit Die Pools**: Character-specific dice pools with configurable sizes
 - **Techniques**: Special abilities with SP (Spirit Point) effects
 - **Active Effects**: Temporary character modifiers
