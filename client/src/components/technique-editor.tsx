@@ -127,6 +127,7 @@ export default function TechniqueEditor({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter technique name"
+              className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
               required
             />
           </div>
@@ -140,6 +141,7 @@ export default function TechniqueEditor({
               value={triggerDescription}
               onChange={(e) => setTriggerDescription(e.target.value)}
               placeholder="Describe when this technique can be used"
+              className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
               rows={2}
               required
             />
@@ -189,6 +191,7 @@ export default function TechniqueEditor({
                         value={entry.alternateName || ""}
                         onChange={(e) => handleSPEffectChange(index, 'alternateName', e.target.value)}
                         placeholder="Optional different name for this investment level"
+                        className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
                         disabled={!entry.enabled}
                       />
                     </div>
@@ -199,7 +202,7 @@ export default function TechniqueEditor({
                         onValueChange={(value: TriggerType) => handleSPEffectChange(index, 'actionType', value)}
                         disabled={!entry.enabled}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -214,6 +217,7 @@ export default function TechniqueEditor({
                       value={entry.effect}
                       onChange={(e) => handleSPEffectChange(index, 'effect', e.target.value)}
                       placeholder="Describe the effect at this SP level"
+                      className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
                       rows={2}
                       disabled={!entry.enabled}
                     />
