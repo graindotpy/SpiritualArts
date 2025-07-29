@@ -1,6 +1,37 @@
 import { cn } from "@/lib/utils";
 import type { DieSize } from "@shared/schema";
 
+// SVG die symbols for different die types
+const DieSymbols = {
+  d4: (
+    <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+      <path d="M12 2L2 20h20L12 2zm0 3.26L19.07 18H4.93L12 5.26z"/>
+    </svg>
+  ),
+  d6: (
+    <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+      <path d="M12 2l8 4.5v11L12 22l-8-4.5v-11L12 2z"/>
+      <circle cx="12" cy="12" r="1.5"/>
+    </svg>
+  ),
+  d8: (
+    <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+      <path d="M12 2L4 7v5l8 8 8-8V7l-8-5z"/>
+    </svg>
+  ),
+  d10: (
+    <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+      <path d="M12 2L3 7l9 13 9-13-9-5z"/>
+      <path d="M12 2v18"/>
+    </svg>
+  ),
+  d12: (
+    <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+      <path d="M12 2l3.09 6.31L22 9.27l-3.64 5.46L20 21l-8-2-8 2 1.64-6.27L2 9.27l6.91-0.96L12 2z"/>
+    </svg>
+  ),
+};
+
 interface SpiritDieProps {
   size: DieSize;
   isActive: boolean;
@@ -10,11 +41,13 @@ interface SpiritDieProps {
 }
 
 export default function SpiritDie({ size, isActive, isSelected, onClick, className }: SpiritDieProps) {
+  const dieSymbol = DieSymbols[size] || DieSymbols.d6;
+  
   return (
     <div className={cn("relative group", className)}>
       <div 
         className={cn(
-          "w-14 h-14 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg transform transition-all duration-200 border-2",
+          "w-14 h-14 rounded-lg flex flex-col items-center justify-center shadow-lg transform transition-all duration-200 border-2",
           "cursor-pointer select-none",
           isActive 
             ? cn(
@@ -30,7 +63,8 @@ export default function SpiritDie({ size, isActive, isSelected, onClick, classNa
         )}
         onClick={onClick}
       >
-        {size}
+        {dieSymbol}
+        <span className="text-xs font-bold mt-0.5">{size}</span>
       </div>
       
       {isSelected && (

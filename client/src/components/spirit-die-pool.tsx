@@ -40,19 +40,22 @@ export default function SpiritDiePoolComponent({
           const canRestore = originalDie && dieSize !== originalDie;
           
           return (
-            <div key={index} className="flex flex-col items-center space-y-1">
-              {canRestore && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => onDieRestore(index)}
-                  className="h-6 px-2 text-xs text-gray-500 hover:text-spiritual-600 dark:text-gray-400 dark:hover:text-spiritual-400"
-                  title={`Restore to ${originalDie}`}
-                >
-                  <RotateCcw className="w-3 h-3 mr-1" />
-                  Restore
-                </Button>
-              )}
+            <div key={index} className="flex flex-col items-center">
+              {/* Reserve space for restore button to prevent layout shift */}
+              <div className="h-6 mb-1 flex items-center">
+                {canRestore && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onDieRestore(index)}
+                    className="h-6 px-2 text-xs text-gray-500 hover:text-spiritual-600 dark:text-gray-400 dark:hover:text-spiritual-400"
+                    title={`Restore to ${originalDie}`}
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    Restore
+                  </Button>
+                )}
+              </div>
               <SpiritDie
                 size={dieSize}
                 isActive={true}
