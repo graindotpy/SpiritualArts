@@ -6,11 +6,9 @@ import type { SpiritDiePool, DieSize } from "@shared/schema";
 interface SpiritDiePoolProps {
   pool: SpiritDiePool;
   currentDice: DieSize[];
-  onLongRest: () => void;
-  isLoading: boolean;
 }
 
-export default function SpiritDiePoolComponent({ pool, currentDice, onLongRest, isLoading }: SpiritDiePoolProps) {
+export default function SpiritDiePoolComponent({ pool, currentDice }: SpiritDiePoolProps) {
 
   return (
     <div className="mt-6 pt-6 border-t border-gray-200">
@@ -26,20 +24,13 @@ export default function SpiritDiePoolComponent({ pool, currentDice, onLongRest, 
         
         {currentDice.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">No active dice remaining</p>
-            <Button 
-              onClick={onLongRest}
-              disabled={isLoading}
-              className="bg-spiritual-600 hover:bg-spiritual-700"
-            >
-              Take Long Rest
-            </Button>
+            <p className="text-gray-500">No active dice remaining</p>
           </div>
         )}
         
         <div className="flex items-center text-sm text-gray-500 ml-4">
           <Info className="w-4 h-4 mr-2" />
-          Dice restore on long rest
+          Dice reduce on failed rolls
         </div>
       </div>
     </div>

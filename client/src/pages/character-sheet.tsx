@@ -237,22 +237,7 @@ export default function CharacterSheet() {
               isRolling={rollSpiritedie.isPending}
             />
             
-            {/* Quick Actions */}
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  <Button 
-                    variant="secondary" 
-                    className="w-full"
-                    onClick={() => longRest.mutateAsync()}
-                    disabled={longRest.isPending}
-                  >
-                    Long Rest (Restore Dice)
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+
           </div>
         </div>
       </div>
