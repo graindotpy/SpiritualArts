@@ -143,22 +143,22 @@ export default function CharacterSheet() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-gray-900 dark:text-white">
         {/* Character Info & Spirit Die Pool */}
-        <Card className="mb-8">
+        <Card className="mb-8 dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="mb-6 lg:mb-0">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{character.name}</h2>
-                <p className="text-lg text-spiritual-600 font-medium mb-1">{character.path}</p>
-                <p className="text-sm text-gray-500">Level {character.level} Spiritual Artist</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{character.name}</h2>
+                <p className="text-lg text-spiritual-600 dark:text-spiritual-400 font-medium mb-1">{character.path}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Level {character.level} Spiritual Artist</p>
               </div>
               
               {/* Level & Spirit Die Configuration */}
               <div className="lg:text-right">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="level" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="level" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Character Level
                     </Label>
                     <div className="flex gap-2 mt-1">
@@ -171,13 +171,13 @@ export default function CharacterSheet() {
                         onChange={(e) => handleLevelChange(parseInt(e.target.value) || 3)}
                         className="w-20"
                       />
-                      <span className="flex items-center text-sm text-gray-500">
+                      <span className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         → {levelBasedDice.join(', ')}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Manual Override
                     </Label>
                     <div className="flex gap-2 mt-1">
@@ -223,24 +223,24 @@ export default function CharacterSheet() {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Techniques List */}
           <div className="xl:col-span-3">
-            <Card>
-              <CardContent className="p-6 border-b border-gray-200">
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardContent className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">Path Techniques</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Path Techniques</h3>
                   <Button 
                     onClick={handleAddTechnique}
-                    className="bg-spiritual-600 hover:bg-spiritual-700"
+                    className="bg-spiritual-600 hover:bg-spiritual-700 dark:bg-spiritual-700 dark:hover:bg-spiritual-800 text-white"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Technique
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Hover over techniques and scroll to select SP investment, then click to roll
                 </p>
               </CardContent>
               
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {techniques.map((technique) => (
                   <TechniqueCard
                     key={technique.id}
