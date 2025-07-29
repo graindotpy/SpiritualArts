@@ -213,6 +213,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No portrait file provided" });
       }
 
+      // Get the current character to check for existing portrait
+      const character = await storage.getCharacter(req.params.id);
+      if (!character) {
+        // Clean up uploaded file if character doesn't exist
+        fs.unlinkSync(req.file.path);
+        return res.status(404).json({ message: "Character not found" });
+      }
+
       const portraitUrl = `/uploads/portraits/${req.file.filename}`;
       const updated = await storage.updateCharacter(req.params.id, { portraitUrl });
       
@@ -220,6 +228,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Clean up uploaded file if character update fails
         fs.unlinkSync(req.file.path);
         return res.status(404).json({ message: "Character not found" });
+      }
+
+      // Clean up old portrait file if it exists
+      if (character.portraitUrl && character.portraitUrl !== portraitUrl) {
+        const oldFilePath = path.join(process.cwd(), character.portraitUrl);
+        try {
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+            console.log(`Cleaned up old portrait file: ${oldFilePath}`);
+          }
+        } catch (fileError) {
+          console.error("Failed to delete old portrait file:", fileError);
+        }
       }
 
       res.json({ portraitUrl });
