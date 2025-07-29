@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Camera, Trash2, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import ImageCropEditor from "./image-crop-editor";
 
 interface PortraitUploadProps {
   characterId: string;
@@ -16,6 +17,8 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showCropEditor, setShowCropEditor] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -43,22 +46,21 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
       return;
     }
 
-    // Create preview
+    // Store file and create preview
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewUrl(e.target?.result as string);
+      setShowCropEditor(true);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleUpload = async () => {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) return;
-
+  const handleCropSave = async (croppedImageBlob: Blob) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('portrait', file);
+      formData.append('portrait', croppedImageBlob, 'portrait.jpg');
 
       const response = await fetch(`/api/character/${characterId}/portrait`, {
         method: 'POST',
@@ -69,8 +71,6 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
         throw new Error('Upload failed');
       }
 
-      const result = await response.json();
-      
       // Invalidate character queries to refresh the UI
       await queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/character", characterId] });
@@ -80,8 +80,7 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
         description: "Character portrait has been updated successfully",
       });
 
-      setPreviewUrl(null);
-      onClose();
+      handleClose();
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -91,6 +90,15 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setShowCropEditor(false);
+    setPreviewUrl(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -129,19 +137,42 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
     }
   };
 
+  const handleClose = () => {
+    setPreviewUrl(null);
+    setSelectedFile(null);
+    setShowCropEditor(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onClose();
+  };
+
   const displayUrl = previewUrl || currentPortraitUrl;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className={showCropEditor ? "sm:max-w-lg" : "sm:max-w-md"}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5" />
-            Character Portrait
+            {showCropEditor ? "Crop Portrait" : "Character Portrait"}
           </DialogTitle>
+          <DialogDescription>
+            {showCropEditor 
+              ? "Drag to position and zoom to fit your portrait perfectly"
+              : "Upload and manage your character's portrait image"
+            }
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        {showCropEditor && previewUrl ? (
+          <ImageCropEditor
+            imageUrl={previewUrl}
+            onSave={handleCropSave}
+            onCancel={handleCropCancel}
+          />
+        ) : (
+          <div className="space-y-4">
           {/* Current/Preview Portrait */}
           <div className="flex justify-center">
             <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
@@ -179,45 +210,36 @@ export default function PortraitUpload({ characterId, currentPortraitUrl, isOpen
             </Button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            {previewUrl && (
-              <Button
-                onClick={handleUpload}
-                disabled={isUploading || isDeleting}
-                className="flex-1 bg-spiritual-600 hover:bg-spiritual-700"
-              >
-                {isUploading ? "Uploading..." : "Upload Portrait"}
-              </Button>
-            )}
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {currentPortraitUrl && (
+                <Button
+                  onClick={handleDelete}
+                  disabled={isUploading || isDeleting}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {isDeleting ? "Removing..." : "Remove Portrait"}
+                </Button>
+              )}
 
-            {currentPortraitUrl && !previewUrl && (
               <Button
-                onClick={handleDelete}
+                onClick={handleClose}
+                variant="outline"
                 disabled={isUploading || isDeleting}
-                variant="destructive"
-                className="flex-1"
+                className={currentPortraitUrl ? "flex-1" : "w-full"}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {isDeleting ? "Removing..." : "Remove Portrait"}
+                Close
               </Button>
-            )}
+            </div>
 
-            <Button
-              onClick={onClose}
-              variant="outline"
-              disabled={isUploading || isDeleting}
-              className={previewUrl || currentPortraitUrl ? "flex-1" : "w-full"}
-            >
-              {previewUrl ? "Cancel" : "Close"}
-            </Button>
+            {/* Help Text */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              Supported formats: JPG, PNG, GIF • Max size: 5MB
+            </p>
           </div>
-
-          {/* Help Text */}
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Supported formats: JPG, PNG, GIF • Max size: 5MB
-          </p>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

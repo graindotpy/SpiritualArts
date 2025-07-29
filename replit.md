@@ -32,6 +32,12 @@ The application follows a clear separation between frontend and backend:
 - Added camera icon overlay on character cards for easy portrait management
 - Portraits are stored in `/uploads/portraits/` directory and served statically
 - Automatic cleanup of old portrait files when updating or deleting
+- **NEW: Advanced Image Crop Editor** - Drag and zoom controls for perfect portrait positioning
+  - Interactive canvas-based editor with circular crop preview
+  - Zoom slider for precise image scaling (0.5x to 3x)
+  - Drag functionality to position image within crop area
+  - Reset button to center image
+  - Real-time preview of final circular portrait
 
 ### Main Menu Navigation
 - Replaced character switching with dedicated main menu system
