@@ -105,10 +105,9 @@ export default function TechniqueCard({
     <div
       ref={cardRef}
       className={cn(
-        "p-6 transition-colors cursor-pointer group border-2 rounded-lg",
-        isSelected 
-          ? "bg-white text-gray-900 border-spiritual-500 shadow-lg transform scale-105" 
-          : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-spiritual-300"
+        "p-6 transition-all duration-200 cursor-pointer group border-2 rounded-lg",
+        "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700",
+        "hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-spiritual-300 hover:shadow-md hover:scale-105"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -118,10 +117,7 @@ export default function TechniqueCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-3">
-            <h4 className={cn(
-              "text-lg font-semibold group-hover:text-spiritual-600",
-              isSelected ? "text-gray-900" : "text-gray-900 dark:text-white"
-            )}>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-spiritual-600">
               {technique.name}
             </h4>
             <Badge className={getTriggerColor(technique.triggerType)}>
@@ -134,29 +130,17 @@ export default function TechniqueCard({
             )}
           </div>
           
-          <p className={cn(
-            "text-sm mb-4",
-            isSelected ? "text-gray-600" : "text-gray-600 dark:text-gray-300"
-          )}>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             {technique.triggerDescription}
           </p>
           
           {/* Dynamic Effect Display */}
           {currentSP > 0 && spEffects[currentSP] && (
-            <div className={cn(
-              "rounded-lg p-4",
-              isSelected ? "bg-gray-50" : "bg-gray-50 dark:bg-gray-700"
-            )}>
-              <h5 className={cn(
-                "font-medium mb-2",
-                isSelected ? "text-gray-900" : "text-gray-900 dark:text-white"
-              )}>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                 Effect ({currentSP} SP Investment):
               </h5>
-              <p className={cn(
-                "text-sm",
-                isSelected ? "text-gray-700" : "text-gray-700 dark:text-gray-300"
-              )}>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 {spEffects[currentSP]}
               </p>
             </div>
@@ -171,10 +155,7 @@ export default function TechniqueCard({
               e.stopPropagation();
               onEdit(technique);
             }}
-            className={cn(
-              "h-auto p-1 hover:text-gray-600",
-              isSelected ? "text-gray-400" : "text-gray-400 dark:text-gray-500 dark:hover:text-gray-300"
-            )}
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
           >
             <Edit className="w-5 h-5" />
           </Button>
@@ -186,10 +167,7 @@ export default function TechniqueCard({
                 e.stopPropagation();
                 onDelete(technique.id);
               }}
-              className={cn(
-                "h-auto p-1 hover:text-red-600",
-                isSelected ? "text-gray-400" : "text-gray-400 dark:text-gray-500 dark:hover:text-red-400"
-              )}
+              className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 h-auto p-1"
             >
               <Trash2 className="w-5 h-5" />
             </Button>

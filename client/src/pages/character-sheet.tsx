@@ -18,8 +18,6 @@ import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schem
 
 export default function CharacterSheet() {
   const { theme, toggleTheme } = useTheme();
-  const [selectedTechnique, setSelectedTechnique] = useState<string | null>(null);
-  const [selectedSP, setSelectedSP] = useState<number>(0);
   const [selectedDieIndex, setSelectedDieIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
@@ -82,17 +80,14 @@ export default function CharacterSheet() {
     });
   };
 
-  const handleTechniqueSelect = (techniqueId: string, sp: number) => {
-    setSelectedTechnique(techniqueId);
-    setSelectedSP(sp);
-  };
-
-  const handleRoll = async () => {
-    if (!selectedTechnique || !selectedSP || selectedDieIndex === null) return;
-    await rollSpiritedie.mutateAsync({ 
-      spInvestment: selectedSP,
-      dieIndex: selectedDieIndex 
-    });
+  const handleTechniqueSelect = async (techniqueId: string, sp: number) => {
+    // Direct roll when technique is clicked with SP investment
+    if (sp > 0 && selectedDieIndex !== null) {
+      await rollSpiritedie.mutateAsync({ 
+        spInvestment: sp,
+        dieIndex: selectedDieIndex 
+      });
+    }
   };
 
   const handleDieSelect = (index: number) => {
@@ -109,7 +104,7 @@ export default function CharacterSheet() {
     setIsEditorOpen(true);
   };
 
-  const selectedTechniqueData = techniques.find(t => t.id === selectedTechnique);
+  // Remove selected technique data since we no longer track selection
 
   if (!character) {
     return (
@@ -245,7 +240,7 @@ export default function CharacterSheet() {
                   <TechniqueCard
                     key={technique.id}
                     technique={technique}
-                    isSelected={selectedTechnique === technique.id}
+                    isSelected={false}
                     onSelect={handleTechniqueSelect}
                     onEdit={handleEditTechnique}
                   />
@@ -258,10 +253,10 @@ export default function CharacterSheet() {
           <div className="xl:col-span-1 space-y-6">
             {/* Die Roller */}
             <DieRoller
-              selectedTechnique={selectedTechniqueData}
-              selectedSP={selectedSP}
+              selectedTechnique={undefined}
+              selectedSP={0}
               selectedDie={selectedDieIndex !== null ? currentDice[selectedDieIndex] : null}
-              onRoll={handleRoll}
+              onRoll={async () => {}}
               isRolling={rollSpiritedie.isPending}
             />
             
