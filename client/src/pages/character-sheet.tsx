@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,6 +58,23 @@ export default function CharacterSheet() {
   if (selectedDieIndex !== null && selectedDieIndex >= currentDice.length) {
     setSelectedDieIndex(currentDice.length > 0 ? 0 : null);
   }
+
+  // Global cleanup to ensure page scrolling is always restored
+  useEffect(() => {
+    const cleanup = () => {
+      document.body.style.overflow = 'unset';
+    };
+
+    // Cleanup on window focus/blur events
+    window.addEventListener('blur', cleanup);
+    window.addEventListener('beforeunload', cleanup);
+    
+    return () => {
+      cleanup();
+      window.removeEventListener('blur', cleanup);
+      window.removeEventListener('beforeunload', cleanup);
+    };
+  }, []);
 
   const handleLevelChange = async (newLevel: number) => {
     if (!character?.id) return;

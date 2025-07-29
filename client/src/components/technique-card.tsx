@@ -57,17 +57,41 @@ export default function TechniqueCard({
 
   // Prevent page scrolling when hovering over technique card
   useEffect(() => {
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+      document.body.style.overflow = 'unset';
+    };
+
+    const handlePageScroll = (e: WheelEvent) => {
+      // If we're hovering and scrolling, prevent page scroll
+      if (isHovered && cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const isInBounds = e.clientX >= rect.left && e.clientX <= rect.right && 
+                          e.clientY >= rect.top && e.clientY <= rect.bottom;
+        
+        if (isInBounds) {
+          e.preventDefault();
+        } else {
+          // Mouse is outside card bounds, clear hover state
+          setIsHovered(false);
+          document.body.style.overflow = 'unset';
+        }
+      }
+    };
+
     if (isHovered) {
-      // Disable page scrolling
       document.body.style.overflow = 'hidden';
+      document.addEventListener('wheel', handlePageScroll, { passive: false });
+      document.addEventListener('mouseleave', handleMouseLeave);
     } else {
-      // Re-enable page scrolling
       document.body.style.overflow = 'unset';
     }
 
-    // Cleanup function to ensure scrolling is re-enabled
+    // Cleanup function
     return () => {
       document.body.style.overflow = 'unset';
+      document.removeEventListener('wheel', handlePageScroll);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [isHovered]);
 
@@ -112,7 +136,10 @@ export default function TechniqueCard({
         "hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-spiritual-300 hover:shadow-md hover:scale-105"
       )}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        document.body.style.overflow = 'unset';
+      }}
       onWheel={handleWheel}
       onClick={handleClick}
     >
