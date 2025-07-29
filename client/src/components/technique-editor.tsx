@@ -1,0 +1,228 @@
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Trash2 } from "lucide-react";
+import { useCharacterState } from "@/hooks/use-character-state";
+import type { Technique, SPEffect, TriggerType } from "@shared/schema";
+
+interface TechniqueEditorProps {
+  technique: Technique | null;
+  isOpen: boolean;
+  onClose: () => void;
+  characterId: string;
+}
+
+interface SPEffectEntry {
+  sp: number;
+  effect: string;
+  enabled: boolean;
+}
+
+export default function TechniqueEditor({ 
+  technique, 
+  isOpen, 
+  onClose, 
+  characterId 
+}: TechniqueEditorProps) {
+  const [name, setName] = useState("");
+  const [triggerType, setTriggerType] = useState<TriggerType>("action");
+  const [triggerDescription, setTriggerDescription] = useState("");
+  const [spEffects, setSPEffects] = useState<SPEffectEntry[]>([]);
+
+  const { createTechnique, updateTechnique } = useCharacterState(characterId);
+
+  // Initialize form when technique changes
+  useEffect(() => {
+    if (technique) {
+      setName(technique.name);
+      setTriggerType(technique.triggerType as TriggerType);
+      setTriggerDescription(technique.triggerDescription);
+      
+      const effects = technique.spEffects as SPEffect;
+      const entries: SPEffectEntry[] = Object.entries(effects).map(([sp, effect]) => ({
+        sp: parseInt(sp),
+        effect,
+        enabled: true
+      }));
+      setSPEffects(entries.sort((a, b) => a.sp - b.sp));
+    } else {
+      // Reset form for new technique
+      setName("");
+      setTriggerType("action");
+      setTriggerDescription("");
+      setSPEffects([{ sp: 1, effect: "", enabled: true }]);
+    }
+  }, [technique]);
+
+  const handleAddSPLevel = () => {
+    const maxSP = spEffects.length > 0 ? Math.max(...spEffects.map(e => e.sp)) : 0;
+    setSPEffects([...spEffects, { sp: maxSP + 1, effect: "", enabled: true }]);
+  };
+
+  const handleRemoveSPLevel = (index: number) => {
+    setSPEffects(spEffects.filter((_, i) => i !== index));
+  };
+
+  const handleSPEffectChange = (index: number, field: keyof SPEffectEntry, value: any) => {
+    const updated = [...spEffects];
+    updated[index] = { ...updated[index], [field]: value };
+    setSPEffects(updated);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const spEffectsObj: SPEffect = {};
+    spEffects
+      .filter(entry => entry.enabled && entry.effect.trim())
+      .forEach(entry => {
+        spEffectsObj[entry.sp] = entry.effect;
+      });
+
+    const techniqueData = {
+      name,
+      triggerType,
+      triggerDescription,
+      spEffects: spEffectsObj
+    };
+
+    try {
+      if (technique) {
+        await updateTechnique.mutateAsync({ id: technique.id, ...techniqueData });
+      } else {
+        await createTechnique.mutateAsync(techniqueData);
+      }
+      onClose();
+    } catch (error) {
+      console.error("Failed to save technique:", error);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {technique ? "Edit Technique" : "Add New Technique"}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <Label htmlFor="name">Technique Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter technique name"
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="triggerType">Trigger Type</Label>
+            <Select value={triggerType} onValueChange={(value: TriggerType) => setTriggerType(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="action">Action</SelectItem>
+                <SelectItem value="bonus">Bonus Action</SelectItem>
+                <SelectItem value="reaction">Reaction</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="triggerDescription">Trigger Description</Label>
+            <Textarea
+              id="triggerDescription"
+              value={triggerDescription}
+              onChange={(e) => setTriggerDescription(e.target.value)}
+              placeholder="Describe when this technique can be used"
+              rows={2}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label className="block mb-4">SP Investment Effects</Label>
+            <div className="space-y-4">
+              {spEffects.map((entry, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-spiritual-100 text-spiritual-800 px-2 py-1 rounded text-sm font-medium">
+                        <Input
+                          type="number"
+                          value={entry.sp}
+                          onChange={(e) => handleSPEffectChange(index, 'sp', parseInt(e.target.value) || 1)}
+                          className="w-16 h-6 p-1 text-xs border-none bg-transparent"
+                          min="1"
+                        />
+                        SP
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={entry.enabled}
+                          onCheckedChange={(checked) => handleSPEffectChange(index, 'enabled', checked)}
+                        />
+                        <Label className="text-sm text-gray-700">
+                          Enable this investment level
+                        </Label>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveSPLevel(index)}
+                      className="text-red-600 hover:text-red-800 h-auto p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={entry.effect}
+                    onChange={(e) => handleSPEffectChange(index, 'effect', e.target.value)}
+                    placeholder="Describe the effect at this SP level"
+                    rows={2}
+                    disabled={!entry.enabled}
+                  />
+                </div>
+              ))}
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddSPLevel}
+                className="w-full border-2 border-dashed border-gray-300 hover:border-spiritual-400 hover:text-spiritual-600"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add SP Investment Level
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              className="bg-spiritual-600 hover:bg-spiritual-700"
+              disabled={createTechnique.isPending || updateTechnique.isPending}
+            >
+              {technique ? "Update Technique" : "Create Technique"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
