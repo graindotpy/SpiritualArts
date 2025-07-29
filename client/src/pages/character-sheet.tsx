@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Home, Moon, Sun } from "lucide-react";
+import { Plus, Home, Moon, Sun, TrendingUp } from "lucide-react";
 import SpiritDiePoolComponent from "@/components/spirit-die-pool";
 import TechniqueCard from "@/components/technique-card";
 import DieRoller from "@/components/die-roller";
 import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import EditableCharacterHeader from "@/components/editable-character-header";
+import LevelEditor from "@/components/level-editor";
 import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
@@ -25,6 +26,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
+  const [isLevelEditorOpen, setIsLevelEditorOpen] = useState(false);
 
   const { data: spiritDiePool } = useQuery<SpiritDiePool>({
     queryKey: ["/api/character", character.id, "spirit-die-pool"],
@@ -167,9 +169,20 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
                 <h1 className="text-2xl font-bold text-spiritual-700 dark:text-spiritual-400">
                   {character.name}
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {character.path} • Level {character.level}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {character.path} • Level {character.level}
+                  </p>
+                  <Button
+                    onClick={() => setIsLevelEditorOpen(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                  >
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                    Edit
+                  </Button>
+                </div>
               </div>
             </div>
             
@@ -257,6 +270,12 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           onSave={handleDiceOverride}
         />
 
+        {/* Level Editor Dialog */}
+        <LevelEditor
+          character={character}
+          isOpen={isLevelEditorOpen}
+          onClose={() => setIsLevelEditorOpen(false)}
+        />
 
       </main>
     </div>

@@ -46,6 +46,14 @@ The application follows a clear separation between frontend and backend:
 - Character sheets now have "Main Menu" button instead of character selector
 - Proper routing between main menu (/) and character sheets (/character/:id)
 
+### Level Management System
+- **NEW: Level Editor Component** - Edit character levels directly from character sheet
+- Small "Edit" button next to level display in character header
+- Dialog interface for updating character level (1-20) with validation
+- Current level display and input field for new level
+- Automatic character cache invalidation for real-time updates
+- Toast notifications for successful updates and error handling
+
 ## Key Components
 
 ### Database Schema (`shared/schema.ts`)
