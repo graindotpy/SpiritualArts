@@ -106,7 +106,7 @@ export default function TechniqueEditor({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle>
             {technique ? "Edit Technique" : "Add New Technique"}
@@ -143,10 +143,10 @@ export default function TechniqueEditor({
             <Label className="block mb-4">SP Investment Effects</Label>
             <div className="space-y-4">
               {spEffects.map((entry, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <div className="bg-spiritual-100 text-spiritual-800 px-2 py-1 rounded text-sm font-medium">
+                      <div className="bg-spiritual-100 dark:bg-spiritual-800 text-spiritual-800 dark:text-spiritual-200 px-2 py-1 rounded text-sm font-medium">
                         <Input
                           type="number"
                           value={entry.sp}
@@ -161,7 +161,7 @@ export default function TechniqueEditor({
                           checked={entry.enabled}
                           onCheckedChange={(checked) => handleSPEffectChange(index, 'enabled', checked)}
                         />
-                        <Label className="text-sm text-gray-700">
+                        <Label className="text-sm text-gray-700 dark:text-gray-300">
                           Enable this investment level
                         </Label>
                       </div>
@@ -178,7 +178,7 @@ export default function TechniqueEditor({
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-sm">Action Type</Label>
+                      <Label className="text-sm text-gray-700 dark:text-gray-300">Action Type</Label>
                       <Select 
                         value={entry.actionType} 
                         onValueChange={(value: TriggerType) => handleSPEffectChange(index, 'actionType', value)}
@@ -209,7 +209,7 @@ export default function TechniqueEditor({
                 type="button"
                 variant="outline"
                 onClick={handleAddSPLevel}
-                className="w-full border-2 border-dashed border-gray-300 hover:border-spiritual-400 hover:text-spiritual-600"
+                className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-spiritual-400 hover:text-spiritual-600 dark:hover:border-spiritual-500 dark:hover:text-spiritual-400"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Add SP Investment Level
@@ -217,7 +217,7 @@ export default function TechniqueEditor({
             </div>
           </div>
           
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-600">
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancel
             </Button>
