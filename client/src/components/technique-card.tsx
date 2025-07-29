@@ -29,9 +29,11 @@ export default function TechniqueCard({
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
   
   // Initialize currentSP if not set
-  if (currentSP === 0 && spOptions.length > 0) {
-    setCurrentSP(spOptions[0]);
-  }
+  useEffect(() => {
+    if (currentSP === 0 && spOptions.length > 0) {
+      setCurrentSP(spOptions[0]);
+    }
+  }, [currentSP, spOptions]);
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!isHovered || spOptions.length === 0) return;

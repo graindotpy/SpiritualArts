@@ -47,7 +47,7 @@ export default function CharacterSheet() {
   const levelBasedDice = character ? SPIRIT_DIE_PROGRESSION[character.level] || ['d4'] : ['d4'];
   const isUsingOverride = spiritDiePool?.overrideDice !== null;
   const currentDice = spiritDiePool?.currentDice as DieSize[] || levelBasedDice;
-  const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice;
+  const originalDice = isUsingOverride ? (spiritDiePool?.overrideDice as DieSize[] || levelBasedDice) : levelBasedDice as DieSize[];
 
   // Auto-select first die if none selected and dice are available
   if (selectedDieIndex === null && currentDice.length > 0) {
@@ -103,7 +103,7 @@ export default function CharacterSheet() {
     
     // Restore the specific die to its original value
     if (index < originalDice.length) {
-      newDice[index] = originalDice[index];
+      newDice[index] = originalDice[index] as DieSize;
       
       await updateSpiritDiePool.mutateAsync({
         currentDice: newDice
