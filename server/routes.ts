@@ -6,7 +6,18 @@ import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertAct
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Get character (assume first character for now)
+  // Get all characters
+  app.get("/api/characters", async (req, res) => {
+    try {
+      const characterList = await db.select().from(characters);
+      res.json(characterList);
+    } catch (error) {
+      console.error("Characters fetch error:", error);
+      res.status(500).json({ message: "Failed to get characters" });
+    }
+  });
+
+  // Get current/default character (first one for now)
   app.get("/api/character", async (req, res) => {
     try {
       // For now, we'll get the first character from the database
@@ -15,6 +26,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No character found" });
       }
       res.json(characterList[0]);
+    } catch (error) {
+      console.error("Character fetch error:", error);
+      res.status(500).json({ message: "Failed to get character" });
+    }
+  });
+
+  // Get specific character by ID
+  app.get("/api/character/:id", async (req, res) => {
+    try {
+      const character = await storage.getCharacter(req.params.id);
+      if (!character) {
+        return res.status(404).json({ message: "Character not found" });
+      }
+      res.json(character);
     } catch (error) {
       console.error("Character fetch error:", error);
       res.status(500).json({ message: "Failed to get character" });

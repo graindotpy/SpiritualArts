@@ -5,23 +5,27 @@ import SpiritDie from "./spirit-die";
 import type { SpiritDiePool, DieSize } from "@shared/schema";
 
 interface SpiritDiePoolProps {
-  pool: SpiritDiePool;
   currentDice: DieSize[];
   originalDice: DieSize[];
   selectedDieIndex: number | null;
   onDieSelect: (index: number) => void;
   onDieRestore: (index: number) => void;
   onRestoreAll: () => void;
+  isUsingOverride: boolean;
+  onOverride: () => void;
+  onResetToLevel: () => void;
 }
 
 export default function SpiritDiePoolComponent({ 
-  pool, 
   currentDice, 
   originalDice,
   selectedDieIndex, 
   onDieSelect,
   onDieRestore,
-  onRestoreAll
+  onRestoreAll,
+  isUsingOverride,
+  onOverride,
+  onResetToLevel
 }: SpiritDiePoolProps) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">

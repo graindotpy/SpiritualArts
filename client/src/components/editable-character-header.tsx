@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit2, Check, X, Plus, Moon, Sun } from "lucide-react";
+import { Edit2, Check, X, Plus, Moon, Sun, Users } from "lucide-react";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { useTheme } from "@/components/theme-provider";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
@@ -12,9 +12,10 @@ import type { Character } from "@shared/schema";
 interface EditableCharacterHeaderProps {
   character: Character;
   onNewCharacter: () => void;
+  onSwitchCharacter: () => void;
 }
 
-export default function EditableCharacterHeader({ character, onNewCharacter }: EditableCharacterHeaderProps) {
+export default function EditableCharacterHeader({ character, onNewCharacter, onSwitchCharacter }: EditableCharacterHeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingPath, setIsEditingPath] = useState(false);
@@ -158,6 +159,15 @@ export default function EditableCharacterHeader({ character, onNewCharacter }: E
 
       {/* Action Buttons */}
       <div className="flex items-center space-x-2">
+        <Button
+          onClick={onSwitchCharacter}
+          variant="outline"
+          size="sm"
+          className="border-gray-300 dark:border-gray-600"
+        >
+          <Users className="w-4 h-4 mr-2" />
+          Switch Character
+        </Button>
         <Button
           onClick={onNewCharacter}
           className="bg-spiritual-600 hover:bg-spiritual-700 text-white"

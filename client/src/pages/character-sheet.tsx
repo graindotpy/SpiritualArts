@@ -10,6 +10,7 @@ import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import EditableCharacterHeader from "@/components/editable-character-header";
 import CharacterCreator from "@/components/character-creator";
+import CharacterSelector from "@/components/character-selector";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
@@ -20,9 +21,11 @@ export default function CharacterSheet() {
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [currentCharacterId, setCurrentCharacterId] = useState<string | null>(null);
 
   const { data: character } = useQuery<Character>({
-    queryKey: ["/api/character"],
+    queryKey: currentCharacterId ? ["/api/character", currentCharacterId] : ["/api/character"],
   });
 
   const { data: spiritDiePool } = useQuery<SpiritDiePool>({
@@ -78,8 +81,15 @@ export default function CharacterSheet() {
   };
 
   const handleCharacterCreated = (newCharacter: Character) => {
-    // Refresh the page to show the new character
-    window.location.reload();
+    setCurrentCharacterId(newCharacter.id);
+  };
+
+  const handleSwitchCharacter = () => {
+    setIsSelectorOpen(true);
+  };
+
+  const handleCharacterSelect = (selectedCharacter: Character) => {
+    setCurrentCharacterId(selectedCharacter.id);
   };
 
   const handleDiceOverride = async (dice: DieSize[]) => {
@@ -168,6 +178,7 @@ export default function CharacterSheet() {
           <EditableCharacterHeader 
             character={character} 
             onNewCharacter={handleNewCharacter}
+            onSwitchCharacter={handleSwitchCharacter}
           />
         </div>
       </header>
@@ -181,7 +192,7 @@ export default function CharacterSheet() {
               <SpiritDiePoolComponent
                 currentDice={currentDice}
                 originalDice={originalDice}
-                selectedIndex={selectedDieIndex}
+                selectedDieIndex={selectedDieIndex}
                 onDieSelect={handleDieSelect}
                 onDieRestore={handleDieRestore}
                 onRestoreAll={handleRestoreAll}
@@ -210,7 +221,7 @@ export default function CharacterSheet() {
                 <TechniqueCard
                   key={technique.id}
                   technique={technique}
-                  onTechniqueSelect={handleTechniqueSelect}
+                  onSelect={handleTechniqueSelect}
                   onEdit={() => handleEditTechnique(technique)}
                 />
               ))}
@@ -240,13 +251,21 @@ export default function CharacterSheet() {
           isOpen={isOverrideOpen}
           onClose={() => setIsOverrideOpen(false)}
           currentDice={originalDice}
-          onConfirm={handleDiceOverride}
+          onSave={handleDiceOverride}
         />
 
         <CharacterCreator
           isOpen={isCreatorOpen}
           onClose={() => setIsCreatorOpen(false)}
           onCharacterCreated={handleCharacterCreated}
+        />
+
+        <CharacterSelector
+          isOpen={isSelectorOpen}
+          onClose={() => setIsSelectorOpen(false)}
+          onCharacterSelect={handleCharacterSelect}
+          onNewCharacter={handleNewCharacter}
+          currentCharacterId={character?.id}
         />
       </main>
     </div>
