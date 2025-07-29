@@ -61,13 +61,23 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   // Delete technique mutation
   const deleteTechniqueMutation = useMutation({
     mutationFn: async (techniqueId: string) => {
-      return await apiRequest(`/api/techniques/${techniqueId}`, { method: "DELETE" });
+      const response = await fetch(`/api/techniques/${techniqueId}`, { 
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to delete technique: ${response.statusText}`);
+      }
+      return response.json();
     },
     onSuccess: () => {
       techniquesQuery.refetch();
       toast({ title: "Technique deleted successfully" });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Delete error:', error);
       toast({ title: "Failed to delete technique", variant: "destructive" });
     }
   });

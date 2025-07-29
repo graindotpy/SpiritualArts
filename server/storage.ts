@@ -15,7 +15,7 @@ import {
   SPIRIT_DIE_PROGRESSION
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -301,7 +301,9 @@ export class DatabaseStorage implements IStorage {
 
   // Techniques
   async getTechniques(characterId: string): Promise<Technique[]> {
-    return await db.select().from(techniques).where(eq(techniques.characterId, characterId));
+    return await db.select().from(techniques).where(
+      and(eq(techniques.characterId, characterId), eq(techniques.isActive, true))
+    );
   }
 
   async getTechnique(id: string): Promise<Technique | undefined> {
@@ -327,12 +329,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteTechnique(id: string): Promise<boolean> {
-    const [updated] = await db
-      .update(techniques)
-      .set({ isActive: false })
-      .where(eq(techniques.id, id))
-      .returning();
-    return !!updated;
+    const result = await db
+      .delete(techniques)
+      .where(eq(techniques.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Active Effects
