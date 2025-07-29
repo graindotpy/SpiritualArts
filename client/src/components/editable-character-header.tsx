@@ -160,9 +160,7 @@ export default function EditableCharacterHeader({ character, onNewCharacter }: E
       <div className="flex items-center space-x-2">
         <Button
           onClick={onNewCharacter}
-          variant="outline"
-          size="sm"
-          className="bg-spiritual-50 border-spiritual-200 text-spiritual-700 hover:bg-spiritual-100 dark:bg-spiritual-900 dark:border-spiritual-700 dark:text-spiritual-300 dark:hover:bg-spiritual-800"
+          className="bg-spiritual-600 hover:bg-spiritual-700 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Character
