@@ -66,12 +66,13 @@ export type InsertActiveEffect = z.infer<typeof insertActiveEffectSchema>;
 
 // Additional types for frontend
 export type DieSize = 'd4' | 'd6' | 'd8' | 'd10' | 'd12';
-export type TriggerType = 'action' | 'bonus' | 'reaction';
+export type TriggerType = 'action' | 'bonus' | 'reaction' | 'passive';
 
 export interface SPEffect {
   [spAmount: number]: {
     effect: string;
     actionType: TriggerType;
+    alternateName?: string;
   };
 }
 

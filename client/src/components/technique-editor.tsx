@@ -22,6 +22,7 @@ interface SPEffectEntry {
   effect: string;
   actionType: TriggerType;
   enabled: boolean;
+  alternateName?: string;
 }
 
 export default function TechniqueEditor({ 
@@ -47,20 +48,21 @@ export default function TechniqueEditor({
         sp: parseInt(sp),
         effect: effectData.effect,
         actionType: effectData.actionType,
-        enabled: true
+        enabled: true,
+        alternateName: effectData.alternateName || ""
       }));
       setSPEffects(entries.sort((a, b) => a.sp - b.sp));
     } else {
       // Reset form for new technique
       setName("");
       setTriggerDescription("");
-      setSPEffects([{ sp: 1, effect: "", actionType: "action", enabled: true }]);
+      setSPEffects([{ sp: 1, effect: "", actionType: "action", enabled: true, alternateName: "" }]);
     }
   }, [technique]);
 
   const handleAddSPLevel = () => {
     const maxSP = spEffects.length > 0 ? Math.max(...spEffects.map(e => e.sp)) : 0;
-    setSPEffects([...spEffects, { sp: maxSP + 1, effect: "", actionType: "action", enabled: true }]);
+    setSPEffects([...spEffects, { sp: maxSP + 1, effect: "", actionType: "action", enabled: true, alternateName: "" }]);
   };
 
   const handleRemoveSPLevel = (index: number) => {
@@ -82,7 +84,8 @@ export default function TechniqueEditor({
       .forEach(entry => {
         spEffectsObj[entry.sp] = {
           effect: entry.effect,
-          actionType: entry.actionType
+          actionType: entry.actionType,
+          alternateName: entry.alternateName?.trim() || undefined
         };
       });
 
@@ -146,15 +149,15 @@ export default function TechniqueEditor({
                 <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <div className="bg-spiritual-100 dark:bg-spiritual-800 text-spiritual-800 dark:text-spiritual-200 px-2 py-1 rounded text-sm font-medium">
+                      <div className="bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-sm font-medium flex items-center">
                         <Input
                           type="number"
                           value={entry.sp}
                           onChange={(e) => handleSPEffectChange(index, 'sp', parseInt(e.target.value) || 1)}
-                          className="w-16 h-6 p-1 text-xs border-none bg-transparent"
+                          className="w-16 h-6 p-1 text-xs border-none bg-transparent text-gray-800 dark:text-gray-200"
                           min="1"
                         />
-                        SP
+                        <span className="ml-1">SP</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
@@ -178,6 +181,15 @@ export default function TechniqueEditor({
                   </div>
                   <div className="space-y-3">
                     <div>
+                      <Label className="text-sm text-gray-700 dark:text-gray-300">Alternate Name (optional)</Label>
+                      <Input
+                        value={entry.alternateName || ""}
+                        onChange={(e) => handleSPEffectChange(index, 'alternateName', e.target.value)}
+                        placeholder="Optional different name for this investment level"
+                        disabled={!entry.enabled}
+                      />
+                    </div>
+                    <div>
                       <Label className="text-sm text-gray-700 dark:text-gray-300">Action Type</Label>
                       <Select 
                         value={entry.actionType} 
@@ -191,6 +203,7 @@ export default function TechniqueEditor({
                           <SelectItem value="action">Action</SelectItem>
                           <SelectItem value="bonus">Bonus Action</SelectItem>
                           <SelectItem value="reaction">Reaction</SelectItem>
+                          <SelectItem value="passive">Passive</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

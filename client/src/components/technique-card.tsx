@@ -104,13 +104,15 @@ export default function TechniqueCard({
   const getTriggerColor = (type: string) => {
     switch (type) {
       case 'action':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
       case 'bonus':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200';
       case 'reaction':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200';
+      case 'passive':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
@@ -122,6 +124,8 @@ export default function TechniqueCard({
         return 'Bonus Action';
       case 'reaction':
         return 'Reaction';
+      case 'passive':
+        return 'Passive';
       default:
         return type;
     }
@@ -147,7 +151,7 @@ export default function TechniqueCard({
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-3">
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-spiritual-600">
-              {technique.name}
+              {currentSP > 0 && spEffects[currentSP]?.alternateName ? spEffects[currentSP].alternateName : technique.name}
             </h4>
             {currentSP > 0 && spEffects[currentSP] && (
               <Badge className={getTriggerColor(spEffects[currentSP].actionType)}>
