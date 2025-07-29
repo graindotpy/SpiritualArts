@@ -37,9 +37,7 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
               <h1 className="text-3xl font-bold text-spiritual-700 dark:text-spiritual-400">
                 Spiritual Arts
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
-                Spirit Die System
-              </p>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">Spiritual Arts Mechanics</p>
             </div>
             
             <Button
@@ -53,7 +51,6 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
@@ -138,7 +135,6 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
           </div>
         )}
       </main>
-
       {/* Character Creator Dialog */}
       <CharacterCreator
         isOpen={isCreatorOpen}
