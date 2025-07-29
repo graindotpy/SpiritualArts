@@ -56,6 +56,10 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  
+  /* Custom dialog and component backgrounds - softer than default blacks */
+  --dialog-background: hsl(240, 8%, 12%);
+  --dialog-section: hsl(240, 6%, 18%);
 }
 
 @layer base {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -109,11 +109,14 @@ export default function TechniqueEditor({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[var(--dialog-background)] text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600">
         <DialogHeader>
           <DialogTitle>
             {technique ? "Edit Technique" : "Add New Technique"}
           </DialogTitle>
+          <DialogDescription>
+            {technique ? "Modify technique details and SP investment effects" : "Create a new technique with customizable SP investment levels"}
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -146,7 +149,7 @@ export default function TechniqueEditor({
             <Label className="block mb-4">SP Investment Effects</Label>
             <div className="space-y-4">
               {spEffects.map((entry, index) => (
-                <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-[var(--dialog-section)]">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <div className="bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-sm font-medium flex items-center">
