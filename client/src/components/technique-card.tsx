@@ -52,7 +52,7 @@ export default function TechniqueCard({
 
     const newSP = spOptions[newIndex];
     setCurrentSP(newSP);
-    onSelect(technique.id, newSP);
+    // Don't auto-roll on scroll, only update selection
   };
 
   // Prevent page scrolling when hovering over technique card
