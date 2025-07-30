@@ -38,7 +38,7 @@ export default function SpiritDiePoolComponent({
         )}
       </div>
       
-      <div className="flex items-center space-x-4">
+      <div className="flex items-start space-x-4">
         {/* Show all dice positions based on original dice */}
         {originalDice.map((originalDie, index) => {
           const currentDie = currentDice[index];
@@ -46,21 +46,6 @@ export default function SpiritDiePoolComponent({
           
           return (
             <div key={index} className="flex flex-col items-center">
-              {/* Reserve space for restore button to prevent layout shift */}
-              <div className="h-6 mb-1 flex items-center">
-                {canRestore && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDieRestore(index)}
-                    className="h-6 px-2 text-xs text-gray-500 hover:text-spiritual-600 dark:text-gray-400 dark:hover:text-spiritual-400"
-                    title={`Restore to ${originalDie}`}
-                  >
-                    <RotateCcw className="w-3 h-3 mr-1" />
-                    Restore
-                  </Button>
-                )}
-              </div>
               {currentDie ? (
                 <SpiritDie
                   size={currentDie}
@@ -75,6 +60,21 @@ export default function SpiritDiePoolComponent({
                   </span>
                 </div>
               )}
+              {/* Restore button positioned below the die */}
+              <div className="h-6 mt-1 flex items-center">
+                {canRestore && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onDieRestore(index)}
+                    className="h-6 px-2 text-xs text-gray-500 hover:text-spiritual-600 dark:text-gray-400 dark:hover:text-spiritual-400"
+                    title={`Restore to ${originalDie}`}
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    Restore
+                  </Button>
+                )}
+              </div>
             </div>
           );
         })}
@@ -104,10 +104,7 @@ export default function SpiritDiePoolComponent({
 
       {/* Long Rest Button */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            Complete a long rest to restore all dice to their original values
-          </div>
+        <div className="flex justify-end">
           <Button
             onClick={onRestoreAll}
             variant="outline"
