@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import SpiritDie from "./spirit-die";
+import AnimatedDie from "./animated-die";
 import type { SpiritDiePool, DieSize } from "@shared/schema";
 
 interface SpiritDiePoolProps {
@@ -14,6 +15,8 @@ interface SpiritDiePoolProps {
   isUsingOverride: boolean;
   onOverride: () => void;
   onResetToLevel: () => void;
+  isRolling?: boolean;
+  rollResult?: number | null;
 }
 
 export default function SpiritDiePoolComponent({ 
@@ -25,7 +28,9 @@ export default function SpiritDiePoolComponent({
   onRestoreAll,
   isUsingOverride,
   onOverride,
-  onResetToLevel
+  onResetToLevel,
+  isRolling = false,
+  rollResult = null
 }: SpiritDiePoolProps) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -47,12 +52,21 @@ export default function SpiritDiePoolComponent({
           return (
             <div key={index} className="flex flex-col items-center">
               {currentDie ? (
-                <SpiritDie
-                  size={currentDie}
-                  isActive={true}
-                  isSelected={selectedDieIndex === index}
-                  onClick={() => onDieSelect(index)}
-                />
+                selectedDieIndex === index && isRolling ? (
+                  <AnimatedDie
+                    size={currentDie}
+                    isRolling={isRolling}
+                    finalResult={rollResult}
+                    onRollComplete={() => {}} // Animation handled by parent
+                  />
+                ) : (
+                  <SpiritDie
+                    size={currentDie}
+                    isActive={true}
+                    isSelected={selectedDieIndex === index}
+                    onClick={() => onDieSelect(index)}
+                  />
+                )
               ) : (
                 <div className="w-12 h-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
                   <span className="text-xs text-gray-400">

@@ -32,6 +32,8 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
   const [isLevelEditorOpen, setIsLevelEditorOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
+  const [isRolling, setIsRolling] = useState(false);
+  const [rollResult, setRollResult] = useState<number | null>(null);
 
   // WebSocket for real-time roll notifications
   const { isConnected, lastRollBroadcast } = useWebSocket();
@@ -138,10 +140,22 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const handleTechniqueSelect = async (techniqueId: string, sp: number) => {
     // Direct roll when technique is clicked with SP investment
     if (sp > 0 && selectedDieIndex !== null) {
-      await rollSpiritedie.mutateAsync({ 
-        spInvestment: sp,
-        dieIndex: selectedDieIndex 
-      });
+      setIsRolling(true);
+      try {
+        const result = await rollSpiritedie.mutateAsync({ 
+          spInvestment: sp,
+          dieIndex: selectedDieIndex 
+        });
+        setRollResult(result.value);
+        // Stop rolling after animation completes
+        setTimeout(() => {
+          setIsRolling(false);
+          setRollResult(null);
+        }, 2000);
+      } catch (error) {
+        setIsRolling(false);
+        setRollResult(null);
+      }
     }
   };
 
@@ -262,6 +276,8 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
                 isUsingOverride={isUsingOverride}
                 onOverride={() => setIsOverrideOpen(true)}
                 onResetToLevel={handleResetToLevel}
+                isRolling={isRolling}
+                rollResult={rollResult}
               />
             </div>
           </div>
