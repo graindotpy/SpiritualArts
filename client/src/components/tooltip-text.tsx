@@ -23,7 +23,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
   });
 
   if (!glossaryTerms || glossaryTerms.length === 0) {
-    return <div className={className}>{text}</div>;
+    return <div className={`${className} whitespace-pre-line`}>{text}</div>;
   }
 
   // Create a regex pattern to match all keywords (case-insensitive)
