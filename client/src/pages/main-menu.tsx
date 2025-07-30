@@ -84,10 +84,21 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
                           src={character.portraitUrl}
                           alt={character.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Hide broken image and show fallback icon
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallbackDiv = target.nextElementSibling as HTMLElement;
+                            if (fallbackDiv) {
+                              fallbackDiv.style.display = 'flex';
+                            }
+                          }}
                         />
-                      ) : (
-                        <User className="w-6 h-6 text-spiritual-600 dark:text-spiritual-400" />
-                      )}
+                      ) : null}
+                      <User 
+                        className="w-6 h-6 text-spiritual-600 dark:text-spiritual-400" 
+                        style={{ display: character.portraitUrl ? 'none' : 'flex' }}
+                      />
                     </div>
                     <Button
                       size="sm"

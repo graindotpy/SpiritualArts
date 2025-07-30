@@ -79,9 +79,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Serve uploaded portraits
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  // Utility function to check and clean up missing portrait files
+  async function cleanupMissingPortraits() {
+    try {
+      const allCharacters = await db.select().from(characters);
+      const updates = [];
+      
+      for (const character of allCharacters) {
+        if (character.portraitUrl) {
+          const filePath = path.join(process.cwd(), character.portraitUrl);
+          if (!fs.existsSync(filePath)) {
+            console.log(`Cleaning up missing portrait for ${character.name}: ${character.portraitUrl}`);
+            updates.push(storage.updateCharacter(character.id, { portraitUrl: null }));
+          }
+        }
+      }
+      
+      if (updates.length > 0) {
+        await Promise.all(updates);
+        console.log(`Cleaned up ${updates.length} missing portrait references`);
+      }
+    } catch (error) {
+      console.error('Error cleaning up missing portraits:', error);
+    }
+  }
+
   // Get all characters
   app.get("/api/characters", async (req, res) => {
     try {
+      // Clean up any missing portrait files before returning characters
+      await cleanupMissingPortraits();
       const characterList = await db.select().from(characters);
       res.json(characterList);
     } catch (error) {
@@ -208,10 +235,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update character (level, name, path)
+  // Update character (level, name, path, portraitUrl)
   app.put("/api/character/:id", async (req, res) => {
     try {
-      const { level, name, path } = req.body;
+      const { level, name, path, portraitUrl } = req.body;
       const updateData: any = {};
       
       if (level !== undefined) {
@@ -233,6 +260,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "Path must be a non-empty string" });
         }
         updateData.path = path.trim();
+      }
+      
+      if (portraitUrl !== undefined) {
+        updateData.portraitUrl = portraitUrl;
       }
       
       const updated = await storage.updateCharacter(req.params.id, updateData);
