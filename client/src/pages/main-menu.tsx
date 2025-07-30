@@ -18,7 +18,7 @@ interface MainMenuProps {
 
 export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
   const { theme, toggleTheme } = useTheme();
-  const { playClick, playHover } = useAudio();
+  const { playClick } = useAudio();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
   const [portraitUploadId, setPortraitUploadId] = useState<string | null>(null);
 
@@ -82,7 +82,6 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
             <Card
               key={character.id}
               className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-              onMouseEnter={playHover}
               onClick={() => {
                 playClick();
                 handleCharacterSelect(character);
@@ -147,7 +146,6 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
           {/* Create New Character Card */}
           <Card
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-2 border-dashed border-spiritual-300 dark:border-spiritual-600"
-            onMouseEnter={playHover}
             onClick={() => {
               playClick();
               setIsCreatorOpen(true);

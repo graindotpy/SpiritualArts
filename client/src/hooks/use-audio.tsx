@@ -24,14 +24,14 @@ class AudioManager {
   private generateSounds() {
     if (!this.audioContext) return;
 
-    // Generate hover sound (subtle high-pitched blip)
-    const hoverBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * 0.1, this.audioContext.sampleRate);
-    const hoverData = hoverBuffer.getChannelData(0);
-    for (let i = 0; i < hoverData.length; i++) {
+    // Generate scroll sound (small click for SP investment changes)
+    const scrollBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * 0.08, this.audioContext.sampleRate);
+    const scrollData = scrollBuffer.getChannelData(0);
+    for (let i = 0; i < scrollData.length; i++) {
       const t = i / this.audioContext.sampleRate;
-      hoverData[i] = Math.sin(2 * Math.PI * 800 * t) * Math.exp(-t * 20) * 0.1;
+      scrollData[i] = Math.sin(2 * Math.PI * 500 * t) * Math.exp(-t * 25) * 0.12;
     }
-    this.sounds.set('hover', hoverBuffer);
+    this.sounds.set('scroll', scrollBuffer);
 
     // Generate click sound (gentle pop)
     const clickBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * 0.15, this.audioContext.sampleRate);
@@ -92,7 +92,7 @@ class AudioManager {
 const audioManager = new AudioManager();
 
 export function useAudio() {
-  const playHover = useCallback(() => audioManager.playSound('hover', 0.2), []);
+  const playScroll = useCallback(() => audioManager.playSound('scroll', 0.25), []);
   const playClick = useCallback(() => audioManager.playSound('click', 0.3), []);
   const playSuccess = useCallback(() => audioManager.playSound('success', 0.25), []);
   const playError = useCallback(() => audioManager.playSound('error', 0.2), []);
@@ -115,7 +115,7 @@ export function useAudio() {
   }, []);
 
   return {
-    playHover,
+    playScroll,
     playClick,
     playSuccess,
     playError,

@@ -25,7 +25,7 @@ export default function TechniqueCard({
   const [currentSP, setCurrentSP] = useState<number>(0);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { playHover, playClick } = useAudio();
+  const { playScroll, playClick } = useAudio();
 
   const spEffects = technique.spEffects as SPEffect;
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
@@ -53,7 +53,10 @@ export default function TechniqueCard({
     }
 
     const newSP = spOptions[newIndex];
-    setCurrentSP(newSP);
+    if (newSP !== currentSP) {
+      setCurrentSP(newSP);
+      playScroll(); // Play scroll sound when SP investment changes
+    }
     // Don't auto-roll on scroll, only update selection
   };
 
@@ -141,10 +144,7 @@ export default function TechniqueCard({
         "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700",
         "hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-spiritual-300 hover:shadow-md hover:scale-105"
       )}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        playHover();
-      }}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
         document.body.style.overflow = 'unset';
