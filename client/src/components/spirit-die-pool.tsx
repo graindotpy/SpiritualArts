@@ -39,9 +39,10 @@ export default function SpiritDiePoolComponent({
       </div>
       
       <div className="flex items-center space-x-4">
-        {currentDice.map((dieSize, index) => {
-          const originalDie = originalDice[index];
-          const canRestore = originalDie && dieSize !== originalDie;
+        {/* Show all dice positions based on original dice */}
+        {originalDice.map((originalDie, index) => {
+          const currentDie = currentDice[index];
+          const canRestore = currentDie !== originalDie;
           
           return (
             <div key={index} className="flex flex-col items-center">
@@ -60,12 +61,20 @@ export default function SpiritDiePoolComponent({
                   </Button>
                 )}
               </div>
-              <SpiritDie
-                size={dieSize}
-                isActive={true}
-                isSelected={selectedDieIndex === index}
-                onClick={() => onDieSelect(index)}
-              />
+              {currentDie ? (
+                <SpiritDie
+                  size={currentDie}
+                  isActive={true}
+                  isSelected={selectedDieIndex === index}
+                  onClick={() => onDieSelect(index)}
+                />
+              ) : (
+                <div className="w-12 h-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                  <span className="text-xs text-gray-400">
+                    {originalDie}
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}
@@ -90,6 +99,24 @@ export default function SpiritDiePoolComponent({
         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 ml-4">
           <Info className="w-4 h-4 mr-2" />
           Dice reduce on failed rolls
+        </div>
+      </div>
+
+      {/* Long Rest Button */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Complete a long rest to restore all dice to their original values
+          </div>
+          <Button
+            onClick={onRestoreAll}
+            variant="outline"
+            size="sm"
+            className="bg-spiritual-50 border-spiritual-200 text-spiritual-700 hover:bg-spiritual-100 dark:bg-spiritual-900 dark:border-spiritual-700 dark:text-spiritual-300 dark:hover:bg-spiritual-800"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Long Rest
+          </Button>
         </div>
       </div>
     </div>

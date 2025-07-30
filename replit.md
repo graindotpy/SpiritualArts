@@ -32,12 +32,20 @@ The application follows a clear separation between frontend and backend:
   - Support for text blocks, tables, and images in structured format
   - Interactive content editor with add/remove functionality for content blocks
   - Table editor with dynamic headers and rows
+  - **Local Image Upload Support** - Camera button for selecting and uploading local images
   - Image support with URL, alt text, and caption fields
-- **Enhanced TooltipText Component** - "View Enhanced Details" button appears when enhanced content exists
+- **Enhanced TooltipText Component** - Always shows expand button ("View Enhanced Details" or "Add Enhanced Content")
 - **Rich Content Editing Interface** - GUI-based editor for creating detailed tooltip content
-- Sample enhanced glossary terms created (Spirit Die, SP Investment) with comprehensive tables and explanations
+- **Event Handling Improvements** - Prevents technique rolling when tooltip dialogs are open
 - Accessibility improvements with proper dialog descriptions
 - Real-time preview and editing capabilities for all content types
+
+### Spirit Die Pool Enhancements (January 30, 2025)
+- **Fixed Missing Dice Restore Buttons** - Restore buttons now visible for completely removed dice
+- **Visual Placeholder for Missing Dice** - Dashed borders show where removed dice were originally
+- **Long Rest Button Added** - Always-visible button to restore all dice to original values
+- **Improved Layout Consistency** - All dice positions maintained regardless of current state
+- Enhanced user experience with clear visual feedback for dice reduction and restoration
 
 ### Portrait Upload System
 - Added `portraitUrl` field to characters schema for image storage
