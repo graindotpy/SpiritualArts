@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,7 @@ export default function ExpandedTooltipDialog({
 }: ExpandedTooltipDialogProps) {
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -55,6 +56,16 @@ export default function ExpandedTooltipDialog({
       setContentBlocks([]);
     }
   }, [term.expandedContent]);
+
+  // Handle graceful closing with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    // Wait for animation to complete before actually closing
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 350); // Slightly longer than animation duration
+  }, [onClose]);
 
   const updateTerm = useMutation({
     mutationFn: async (data: Partial<GlossaryTerm>) => {
@@ -396,12 +407,16 @@ export default function ExpandedTooltipDialog({
 
   return (
     <Dialog 
-      open={open} 
-      onOpenChange={onClose}
+      open={open && !isClosing} 
+      onOpenChange={(newOpen) => {
+        if (!newOpen) {
+          handleClose();
+        }
+      }}
       modal={true}
     >
       <DialogContent 
-        className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 duration-300"
+        className={`max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-300 ${isClosing ? 'animate-out fade-out-0 zoom-out-95 slide-out-to-top-[48%]' : ''}`}
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
