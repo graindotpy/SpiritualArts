@@ -4,6 +4,8 @@ import {
   techniques,
   activeEffects,
   glossaryTerms,
+  users,
+  techniquePreferences,
   type Character, 
   type InsertCharacter,
   type SpiritDiePool,
@@ -14,6 +16,10 @@ import {
   type InsertActiveEffect,
   type GlossaryTerm,
   type InsertGlossaryTerm,
+  type User,
+  type UpsertUser,
+  type TechniquePreference,
+  type InsertTechniquePreference,
   type DieSize,
   SPIRIT_DIE_PROGRESSION
 } from "@shared/schema";
@@ -51,6 +57,14 @@ export interface IStorage {
   createGlossaryTerm(term: InsertGlossaryTerm): Promise<GlossaryTerm>;
   updateGlossaryTerm(id: string, term: Partial<GlossaryTerm>): Promise<GlossaryTerm | undefined>;
   deleteGlossaryTerm(id: string): Promise<boolean>;
+
+  // Users (for authentication)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
+  // Technique Preferences
+  getTechniquePreferences(userId: string): Promise<TechniquePreference[]>;
+  upsertTechniquePreference(preference: InsertTechniquePreference): Promise<TechniquePreference>;
 }
 
 export class MemStorage implements IStorage {
@@ -477,6 +491,50 @@ export class DatabaseStorage implements IStorage {
   async deleteGlossaryTerm(id: string): Promise<boolean> {
     const result = await db.delete(glossaryTerms).where(eq(glossaryTerms.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Users (for authentication)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  // Technique Preferences
+  async getTechniquePreferences(userId: string): Promise<TechniquePreference[]> {
+    return await db.select().from(techniquePreferences).where(eq(techniquePreferences.userId, userId));
+  }
+
+  async upsertTechniquePreference(preference: InsertTechniquePreference): Promise<TechniquePreference> {
+    // First ensure the user exists
+    await this.upsertUser({ id: preference.userId });
+    
+    const [result] = await db
+      .insert(techniquePreferences)
+      .values(preference)
+      .onConflictDoUpdate({
+        target: [techniquePreferences.userId, techniquePreferences.techniqueId],
+        set: {
+          isMinimized: preference.isMinimized,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
   }
 }
 

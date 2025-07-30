@@ -123,3 +123,54 @@ export const SPIRIT_DIE_PROGRESSION: Record<number, DieSize[]> = {
   19: ['d10', 'd12'],
   20: ['d12', 'd12']
 };
+
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for authentication
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User preferences for technique UI state
+export const techniquePreferences = pgTable("technique_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  techniqueId: varchar("technique_id").notNull().references(() => techniques.id, { onDelete: "cascade" }),
+  isMinimized: boolean("is_minimized").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userTechniqueUnique: index("user_technique_unique").on(table.userId, table.techniqueId)
+}));
+
+// Relations
+export const techniquePreferencesRelations = relations(techniquePreferences, ({ one }) => ({
+  user: one(users, {
+    fields: [techniquePreferences.userId],
+    references: [users.id],
+  }),
+  technique: one(techniques, {
+    fields: [techniquePreferences.techniqueId],
+    references: [techniques.id],
+  }),
+}));
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type TechniquePreference = typeof techniquePreferences.$inferSelect;
+export type InsertTechniquePreference = typeof techniquePreferences.$inferInsert;

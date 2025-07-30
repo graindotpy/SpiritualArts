@@ -669,5 +669,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technique Preferences endpoints
+  app.get("/api/technique-preferences/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const preferences = await storage.getTechniquePreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Technique preferences fetch error:", error);
+      res.status(500).json({ message: "Failed to get technique preferences" });
+    }
+  });
+
+  app.post("/api/technique-preferences", async (req, res) => {
+    try {
+      const { userId, techniqueId, isMinimized } = req.body;
+      
+      if (!userId || !techniqueId || typeof isMinimized !== 'boolean') {
+        return res.status(400).json({ message: "Invalid preference data" });
+      }
+
+      const preference = await storage.upsertTechniquePreference({
+        userId,
+        techniqueId,
+        isMinimized
+      });
+      
+      res.json(preference);
+    } catch (error) {
+      console.error("Technique preference update error:", error);
+      res.status(500).json({ message: "Failed to update technique preference" });
+    }
+  });
+
   return httpServer;
 }

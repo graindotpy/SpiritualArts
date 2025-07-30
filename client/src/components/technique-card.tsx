@@ -6,7 +6,9 @@ import { Edit, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TooltipText from "./tooltip-text";
 import { useTooltipContext } from "@/contexts/tooltip-context";
-import type { Technique, SPEffect } from "@shared/schema";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import type { Technique, SPEffect, TechniquePreference } from "@shared/schema";
 
 interface TechniqueCardProps {
   technique: Technique;
@@ -15,6 +17,16 @@ interface TechniqueCardProps {
   onEdit: (technique: Technique) => void;
   onDelete?: (techniqueId: string) => void;
 }
+
+// Simple user ID generator for demo purposes
+const getUserId = () => {
+  let userId = localStorage.getItem('userId');
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('userId', userId);
+  }
+  return userId;
+};
 
 export default function TechniqueCard({ 
   technique, 
@@ -28,6 +40,37 @@ export default function TechniqueCard({
   const [isMinimized, setIsMinimized] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const { isEnhancedTooltipOpen } = useTooltipContext();
+  const queryClient = useQueryClient();
+  
+  const userId = getUserId();
+
+  // Query user preferences
+  const { data: preferences = [] } = useQuery<TechniquePreference[]>({
+    queryKey: ['/api/technique-preferences', userId],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Mutation to update preferences
+  const updatePreferenceMutation = useMutation({
+    mutationFn: async ({ isMinimized }: { isMinimized: boolean }) => {
+      return apiRequest(`/api/technique-preferences`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          techniqueId: technique.id,
+          isMinimized
+        })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['/api/technique-preferences', userId]
+      });
+    }
+  });
 
   const spEffects = technique.spEffects as SPEffect;
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
@@ -38,6 +81,14 @@ export default function TechniqueCard({
       setCurrentSP(spOptions[0]);
     }
   }, [currentSP, spOptions]);
+
+  // Update local isMinimized state based on user preferences
+  useEffect(() => {
+    const preference = preferences.find(p => p.techniqueId === technique.id);
+    if (preference) {
+      setIsMinimized(preference.isMinimized);
+    }
+  }, [preferences, technique.id]);
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!isHovered || spOptions.length === 0) return;
@@ -181,7 +232,9 @@ export default function TechniqueCard({
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsMinimized(!isMinimized);
+                  const newMinimizedState = !isMinimized;
+                  setIsMinimized(newMinimizedState);
+                  updatePreferenceMutation.mutate({ isMinimized: newMinimizedState });
                 }}
                 className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
                 title={isMinimized ? "Expand technique" : "Minimize technique"}
