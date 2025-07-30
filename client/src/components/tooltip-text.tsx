@@ -45,9 +45,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
       t.keyword.toLowerCase() === match![0].toLowerCase()
     );
     
-    if (tooltip) {
-      console.log('Tooltip found:', tooltip.keyword, 'hasExpandedContent:', tooltip.hasExpandedContent, 'expandedContent:', !!tooltip.expandedContent);
-    }
+
 
     if (tooltip) {
       parts.push(
@@ -69,10 +67,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
                 <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                   {tooltip.definition}
                 </p>
-                {/* Debug info */}
-                <div className="text-xs text-gray-500">
-                  hasExpanded: {String(tooltip.hasExpandedContent)}, content: {tooltip.expandedContent ? 'yes' : 'no'}
-                </div>
+
                 {(tooltip.hasExpandedContent || tooltip.expandedContent) && (
                   <Button
                     size="sm"

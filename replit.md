@@ -25,6 +25,20 @@ The application follows a clear separation between frontend and backend:
 
 ## Recent Changes (January 2025)
 
+### Enhanced Expandable Tooltip System (January 30, 2025)
+- **Complete Expandable Tooltip Implementation** - Two-tier tooltip system with basic hover and enhanced modal views
+- Database schema enhanced with `expandedContent` and `hasExpandedContent` fields for rich content storage
+- **ExpandedTooltipDialog Component** - Full-screen modal with rich content editing capabilities
+  - Support for text blocks, tables, and images in structured format
+  - Interactive content editor with add/remove functionality for content blocks
+  - Table editor with dynamic headers and rows
+  - Image support with URL, alt text, and caption fields
+- **Enhanced TooltipText Component** - "View Enhanced Details" button appears when enhanced content exists
+- **Rich Content Editing Interface** - GUI-based editor for creating detailed tooltip content
+- Sample enhanced glossary terms created (Spirit Die, SP Investment) with comprehensive tables and explanations
+- Accessibility improvements with proper dialog descriptions
+- Real-time preview and editing capabilities for all content types
+
 ### Portrait Upload System
 - Added `portraitUrl` field to characters schema for image storage
 - Implemented multer-based file upload with 5MB limit and image validation
@@ -55,6 +69,14 @@ The application follows a clear separation between frontend and backend:
 - Resets any custom dice overrides when level changes
 - Automatic character cache invalidation for real-time updates
 - Toast notifications for successful updates and error handling
+
+### Comprehensive Glossary System
+- **Basic Hover Tooltips** - Quick reference definitions appear on hover over keyword matches
+- **Expandable Enhanced Tooltips** - Modal dialogs with rich content including tables, images, and detailed text
+- **Smart Content Detection** - System automatically detects when enhanced content exists and shows expand button
+- **Rich Content Editor** - Full GUI for creating and editing enhanced tooltip content with multiple content types
+- **Keyword Matching** - Case-insensitive automatic detection of glossary terms in all text content
+- Sample enhanced content demonstrates table formatting for die sizes, SP investment levels, and strategic considerations
 
 ### Data Synchronization Fix (January 29, 2025)
 - **RESOLVED: Character Level Display Bug** - Fixed stale character data in character sheet
