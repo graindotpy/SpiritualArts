@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Moon, Sun, User, Camera } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { AudioSettings } from "@/components/audio-settings";
 import { useWebSocket } from "@/hooks/use-websocket";
-import { useAudio } from "@/hooks/use-audio";
 import CharacterCreator from "@/components/character-creator";
 import PortraitUpload from "@/components/portrait-upload";
 import SpiritRollNotification from "@/components/spirit-roll-notification";
@@ -18,7 +16,6 @@ interface MainMenuProps {
 
 export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
   const { theme, toggleTheme } = useTheme();
-  const { playClick } = useAudio();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
   const [portraitUploadId, setPortraitUploadId] = useState<string | null>(null);
 
@@ -48,20 +45,14 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
               <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">Spiritual Arts Mechanics</p>
             </div>
             
-            <div className="flex items-center gap-2">
-              <AudioSettings />
-              <Button
-                onClick={() => {
-                  playClick();
-                  toggleTheme();
-                }}
-                variant="outline"
-                size="sm"
-                className="p-2"
-              >
-                {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-              </Button>
-            </div>
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="sm"
+              className="p-2"
+            >
+              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
           </div>
         </div>
       </header>
@@ -82,10 +73,7 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
             <Card
               key={character.id}
               className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-              onClick={() => {
-                playClick();
-                handleCharacterSelect(character);
-              }}
+              onClick={() => handleCharacterSelect(character)}
             >
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
@@ -146,10 +134,7 @@ export default function MainMenu({ onCharacterSelect }: MainMenuProps) {
           {/* Create New Character Card */}
           <Card
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-2 border-dashed border-spiritual-300 dark:border-spiritual-600"
-            onClick={() => {
-              playClick();
-              setIsCreatorOpen(true);
-            }}
+            onClick={() => setIsCreatorOpen(true)}
           >
             <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[180px]">
               <div className="w-12 h-12 bg-spiritual-100 dark:bg-spiritual-900 rounded-full flex items-center justify-center mb-4">

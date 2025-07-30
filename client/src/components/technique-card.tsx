@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAudio } from "@/hooks/use-audio";
 import type { Technique, SPEffect } from "@shared/schema";
 
 interface TechniqueCardProps {
@@ -25,7 +24,6 @@ export default function TechniqueCard({
   const [currentSP, setCurrentSP] = useState<number>(0);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { playScroll, playClick } = useAudio();
 
   const spEffects = technique.spEffects as SPEffect;
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
@@ -53,10 +51,7 @@ export default function TechniqueCard({
     }
 
     const newSP = spOptions[newIndex];
-    if (newSP !== currentSP) {
-      setCurrentSP(newSP);
-      playScroll(); // Play scroll sound when SP investment changes
-    }
+    setCurrentSP(newSP);
     // Don't auto-roll on scroll, only update selection
   };
 
@@ -150,10 +145,7 @@ export default function TechniqueCard({
         document.body.style.overflow = 'unset';
       }}
       onWheel={handleWheel}
-      onClick={() => {
-        playClick();
-        handleClick();
-      }}
+      onClick={handleClick}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
@@ -196,7 +188,6 @@ export default function TechniqueCard({
             variant="ghost"
             onClick={(e) => {
               e.stopPropagation();
-              playClick();
               onEdit(technique);
             }}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
@@ -209,7 +200,6 @@ export default function TechniqueCard({
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
-                playClick();
                 if (confirm(`Are you sure you want to delete "${technique.name}"? This cannot be undone.`)) {
                   onDelete(technique.id);
                 }

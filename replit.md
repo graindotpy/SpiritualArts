@@ -25,14 +25,6 @@ The application follows a clear separation between frontend and backend:
 
 ## Recent Changes (January 2025)
 
-### Audio Enhancement System (January 30, 2025)
-- **Refined Audio Feedback** - Removed hover sounds based on user feedback (too noisy)
-- **SP Investment Scroll Sounds** - Added subtle click sound (500Hz, 0.08s) when scrolling to change SP investment
-- Audio only triggers on meaningful interactions (SP changes, button clicks)
-- Audio settings toggle remains in header for easy control
-- Preserved click sounds for buttons and selections
-- User preference: "Not keen on hover sounds, too much noise"
-
 ### Portrait Upload System
 - Added `portraitUrl` field to characters schema for image storage
 - Implemented multer-based file upload with 5MB limit and image validation
