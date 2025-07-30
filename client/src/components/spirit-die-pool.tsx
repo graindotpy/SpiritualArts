@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Info, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import SpiritDie from "./spirit-die";
 import type { SpiritDiePool, DieSize } from "@shared/schema";
 
@@ -38,7 +38,7 @@ export default function SpiritDiePoolComponent({
         )}
       </div>
       
-      <div className="flex items-start space-x-4">
+      <div className="flex items-start justify-center space-x-4">
         {/* Show all dice positions based on original dice */}
         {originalDice.map((originalDie, index) => {
           const currentDie = currentDice[index];
@@ -80,7 +80,7 @@ export default function SpiritDiePoolComponent({
         })}
         
         {currentDice.length === 0 && (
-          <div className="text-center py-8">
+          <div className="text-center py-8 flex flex-col items-center">
             <p className="text-gray-500 dark:text-gray-400 mb-4">No active dice remaining</p>
             {originalDice.length > 0 && (
               <Button
@@ -95,11 +95,7 @@ export default function SpiritDiePoolComponent({
             )}
           </div>
         )}
-        
-        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 ml-4">
-          <Info className="w-4 h-4 mr-2" />
-          Dice reduce on failed rolls
-        </div>
+
       </div>
 
       {/* Long Rest Button */}
