@@ -24,6 +24,7 @@ export const techniques = pgTable("techniques", {
   name: text("name").notNull(),
   triggerDescription: text("trigger_description").notNull(),
   spEffects: jsonb("sp_effects").notNull(), // Object mapping SP amounts to { effect, actionType }
+  tooltips: jsonb("tooltips").$type<Array<{ keyword: string; definition: string }>>().default([]),
   isActive: boolean("is_active").notNull().default(true),
 });
 

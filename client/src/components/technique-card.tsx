@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import TooltipText from "./tooltip-text";
 import type { Technique, SPEffect } from "@shared/schema";
 
 interface TechniqueCardProps {
@@ -165,9 +166,11 @@ export default function TechniqueCard({
             )}
           </div>
           
-          <div className="text-sm text-gray-600 dark:text-gray-300 mb-4 whitespace-pre-line">
-            {technique.triggerDescription}
-          </div>
+          <TooltipText 
+            text={technique.triggerDescription}
+            tooltips={technique.tooltips || []}
+            className="text-sm text-gray-600 dark:text-gray-300 mb-4"
+          />
           
           {/* Dynamic Effect Display */}
           {currentSP > 0 && spEffects[currentSP] && (
@@ -175,9 +178,11 @@ export default function TechniqueCard({
               <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                 Effect ({currentSP} SP Investment):
               </h5>
-              <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                {spEffects[currentSP].effect}
-              </div>
+              <TooltipText 
+                text={spEffects[currentSP].effect}
+                tooltips={technique.tooltips || []}
+                className="text-sm text-gray-700 dark:text-gray-300"
+              />
             </div>
           )}
         </div>
