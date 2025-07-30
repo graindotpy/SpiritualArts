@@ -233,7 +233,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
                 onClick={onReturnToMenu}
                 variant="outline"
                 size="sm"
-                className="flex items-center"
+                className="flex items-center border-spiritual-600 text-spiritual-600 hover:bg-spiritual-50 dark:border-spiritual-400 dark:text-spiritual-400 dark:hover:bg-spiritual-900"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Main Menu

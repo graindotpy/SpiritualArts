@@ -116,7 +116,7 @@ export default function SpiritDiePoolComponent({
             onClick={onRestoreAll}
             variant="outline"
             size="sm"
-            className="bg-spiritual-50 border-spiritual-200 text-spiritual-700 hover:bg-spiritual-100 dark:bg-spiritual-900 dark:border-spiritual-700 dark:text-spiritual-300 dark:hover:bg-spiritual-800"
+            className="border-spiritual-600 text-spiritual-600 hover:bg-spiritual-50 dark:border-spiritual-400 dark:text-spiritual-400 dark:hover:bg-spiritual-900"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Long Rest
