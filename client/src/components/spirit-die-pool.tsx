@@ -50,8 +50,8 @@ export default function SpiritDiePoolComponent({
           const canRestore = currentDie !== originalDie;
           
           return (
-            <div key={index} className="flex flex-col items-center min-h-[120px]">
-              <div className="h-16 flex items-center">
+            <div key={index} className="flex flex-col items-center w-20">
+              <div className="h-16 w-16 flex items-center justify-center">
                 {currentDie ? (
                   selectedDieIndex === index && isRolling ? (
                     <AnimatedDie
@@ -76,8 +76,8 @@ export default function SpiritDiePoolComponent({
                   </div>
                 )}
               </div>
-              {/* Restore button positioned below the die - fixed height container */}
-              <div className="h-8 mt-2 flex items-center justify-center">
+              {/* Restore button positioned below the die - fixed height container to prevent shifting */}
+              <div className="h-10 mt-2 flex items-start justify-center">
                 {canRestore && (
                   <Button
                     size="sm"

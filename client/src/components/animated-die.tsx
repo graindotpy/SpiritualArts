@@ -29,7 +29,7 @@ export default function AnimatedDie({
   useEffect(() => {
     if (!isRolling) return;
 
-    setAnimationClass("animate-roll-bounce");
+    setAnimationClass("animate-roll-bounce animate-roll-spin");
     const maxValue = getMaxValue(size);
     
     // Show random values during rolling
