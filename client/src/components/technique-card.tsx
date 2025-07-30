@@ -80,9 +80,12 @@ export default function TechniqueCard({
   useEffect(() => {
     const preference = preferences.find(p => p.techniqueId === technique.id);
     if (preference) {
+      console.log(`Setting ${technique.name} minimized state to:`, preference.isMinimized);
       setIsMinimized(preference.isMinimized);
+    } else {
+      console.log(`No preference found for ${technique.name}, keeping default state`);
     }
-  }, [preferences, technique.id]);
+  }, [preferences, technique.id, technique.name]);
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!isHovered || spOptions.length === 0) return;
