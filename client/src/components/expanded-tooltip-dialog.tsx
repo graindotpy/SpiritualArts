@@ -447,12 +447,21 @@ export default function ExpandedTooltipDialog({
             {contentBlocks.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
                     {isEditing 
                       ? "No enhanced content yet. Use the buttons above to add tables, images, or detailed text."
-                      : "No enhanced content available for this term."
+                      : "No enhanced content available for this term yet."
                     }
                   </p>
+                  {!isEditing && (
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      variant="outline"
+                      className="border-spiritual-600 text-spiritual-600 hover:bg-spiritual-50 dark:border-spiritual-400 dark:text-spiritual-400"
+                    >
+                      Create Enhanced Content
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (

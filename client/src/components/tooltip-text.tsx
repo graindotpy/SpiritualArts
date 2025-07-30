@@ -68,21 +68,21 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
                   {tooltip.definition}
                 </p>
 
-                {(tooltip.hasExpandedContent || tooltip.expandedContent) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setExpandedTerm(tooltip);
-                    }}
-                    className="h-6 px-2 text-xs w-full justify-start"
-                  >
-                    <Maximize2 className="w-3 h-3 mr-1" />
-                    View Enhanced Details
-                  </Button>
-                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setExpandedTerm(tooltip);
+                  }}
+                  className="h-6 px-2 text-xs w-full justify-start"
+                >
+                  <Maximize2 className="w-3 h-3 mr-1" />
+                  {(tooltip.hasExpandedContent || tooltip.expandedContent) 
+                    ? "View Enhanced Details" 
+                    : "Add Enhanced Content"}
+                </Button>
               </div>
             </TooltipContent>
           </Tooltip>
