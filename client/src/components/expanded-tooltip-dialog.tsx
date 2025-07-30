@@ -471,7 +471,7 @@ export default function ExpandedTooltipDialog({
         <div className="space-y-6">
           {/* Basic Definition */}
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-4 bg-[#374151]">
               <h3 className="font-semibold mb-2 text-spiritual-600 dark:text-spiritual-400">
                 Basic Definition
               </h3>
