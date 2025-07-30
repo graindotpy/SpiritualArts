@@ -107,8 +107,8 @@ export default {
         },
       },
       animation: {
-        "roll-spin": "roll-spin 1.2s ease-in-out infinite",
-        "roll-bounce": "roll-bounce 1s ease-in-out infinite",
+        "roll-spin": "roll-spin 4s ease-in-out infinite",
+        "roll-bounce": "roll-bounce 3.3s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

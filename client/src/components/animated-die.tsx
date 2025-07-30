@@ -100,7 +100,7 @@ export default function AnimatedDie({
       
       {/* Rolling indicator */}
       {isRolling && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs font-medium text-amber-600 dark:text-amber-400 animate-pulse">
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-amber-600 dark:text-amber-400 animate-pulse">
           Rolling...
         </div>
       )}

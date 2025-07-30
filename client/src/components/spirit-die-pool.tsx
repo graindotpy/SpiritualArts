@@ -43,39 +43,41 @@ export default function SpiritDiePoolComponent({
         )}
       </div>
       
-      <div className="flex items-start justify-center space-x-4">
+      <div className="flex items-start justify-center space-x-4 mt-4">
         {/* Show all dice positions based on original dice */}
         {originalDice.map((originalDie, index) => {
           const currentDie = currentDice[index];
           const canRestore = currentDie !== originalDie;
           
           return (
-            <div key={index} className="flex flex-col items-center">
-              {currentDie ? (
-                selectedDieIndex === index && isRolling ? (
-                  <AnimatedDie
-                    size={currentDie}
-                    isRolling={isRolling}
-                    finalResult={rollResult}
-                    onRollComplete={() => {}} // Animation handled by parent
-                  />
+            <div key={index} className="flex flex-col items-center min-h-[120px]">
+              <div className="h-16 flex items-center">
+                {currentDie ? (
+                  selectedDieIndex === index && isRolling ? (
+                    <AnimatedDie
+                      size={currentDie}
+                      isRolling={isRolling}
+                      finalResult={rollResult}
+                      onRollComplete={() => {}} // Animation handled by parent
+                    />
+                  ) : (
+                    <SpiritDie
+                      size={currentDie}
+                      isActive={true}
+                      isSelected={selectedDieIndex === index}
+                      onClick={() => onDieSelect(index)}
+                    />
+                  )
                 ) : (
-                  <SpiritDie
-                    size={currentDie}
-                    isActive={true}
-                    isSelected={selectedDieIndex === index}
-                    onClick={() => onDieSelect(index)}
-                  />
-                )
-              ) : (
-                <div className="w-12 h-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
-                  <span className="text-xs text-gray-400">
-                    {originalDie}
-                  </span>
-                </div>
-              )}
-              {/* Restore button positioned below the die */}
-              <div className="h-7 mt-2 flex items-center justify-center">
+                  <div className="w-12 h-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-gray-400">
+                      {originalDie}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {/* Restore button positioned below the die - fixed height container */}
+              <div className="h-8 mt-2 flex items-center justify-center">
                 {canRestore && (
                   <Button
                     size="sm"
