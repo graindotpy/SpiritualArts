@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { Maximize2 } from "lucide-react";
 import ExpandedTooltipDialog from "./expanded-tooltip-dialog";
+import { useTooltipContext } from "@/contexts/tooltip-context";
 import type { GlossaryTerm } from "@shared/schema";
 
 interface TooltipTextProps {
@@ -14,6 +15,7 @@ interface TooltipTextProps {
 
 export default function TooltipText({ text, characterId, className }: TooltipTextProps) {
   const [expandedTerm, setExpandedTerm] = useState<GlossaryTerm | null>(null);
+  const { setIsEnhancedTooltipOpen } = useTooltipContext();
   
   const { data: glossaryTerms = [] } = useQuery<GlossaryTerm[]>({
     queryKey: ["/api/character", characterId, "glossary"],
@@ -76,6 +78,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
                     setExpandedTerm(tooltip);
+                    setIsEnhancedTooltipOpen(true);
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault();
@@ -116,7 +119,10 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
       {expandedTerm && (
         <ExpandedTooltipDialog
           open={!!expandedTerm}
-          onClose={() => setExpandedTerm(null)}
+          onClose={() => {
+            setExpandedTerm(null);
+            setIsEnhancedTooltipOpen(false);
+          }}
           term={expandedTerm}
           characterId={characterId}
         />

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TooltipText from "./tooltip-text";
+import { useTooltipContext } from "@/contexts/tooltip-context";
 import type { Technique, SPEffect } from "@shared/schema";
 
 interface TechniqueCardProps {
@@ -25,6 +26,7 @@ export default function TechniqueCard({
   const [currentSP, setCurrentSP] = useState<number>(0);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const { isEnhancedTooltipOpen } = useTooltipContext();
 
   const spEffects = technique.spEffects as SPEffect;
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
@@ -97,6 +99,11 @@ export default function TechniqueCard({
   }, [isHovered]);
 
   const handleClick = () => {
+    // Prevent rolling when enhanced tooltip dialog is open
+    if (isEnhancedTooltipOpen) {
+      return;
+    }
+    
     if (currentSP > 0) {
       onSelect(technique.id, currentSP);
     }
