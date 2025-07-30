@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Save, Image, Table, Type, X, Upload } from "lucide-react";
+import { Plus, Trash2, Save, Image, Table, Type, X, Upload, Camera } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -92,9 +92,40 @@ export default function ExpandedTooltipDialog({
       type,
       content: type === 'text' ? '' : 
                type === 'table' ? { headers: ['Column 1'], rows: [['Row 1']] } :
-               { url: '', alt: '', caption: '' }
+               { url: '', alt: '', caption: '', file: null }
     };
     setContentBlocks([...contentBlocks, newBlock]);
+  };
+
+  const handleImageUpload = async (blockId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) throw new Error('Upload failed');
+      
+      const result = await response.json();
+      const imageUrl = result.url;
+      
+      setContentBlocks(blocks => 
+        blocks.map(block => 
+          block.id === blockId 
+            ? { ...block, content: { ...block.content, url: imageUrl, file: null } }
+            : block
+        )
+      );
+    } catch (error) {
+      toast({
+        title: "Upload Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateContentBlock = (id: string, content: any) => {
@@ -280,13 +311,34 @@ export default function ExpandedTooltipDialog({
             </div>
             <div className="space-y-2">
               <div>
-                <Label htmlFor={`image-url-${block.id}`}>Image URL</Label>
-                <Input
-                  id={`image-url-${block.id}`}
-                  value={imageData.url}
-                  onChange={(e) => updateContentBlock(block.id, { ...imageData, url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <Label htmlFor={`image-url-${block.id}`}>Image URL or Upload</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id={`image-url-${block.id}`}
+                    value={imageData.url}
+                    onChange={(e) => updateContentBlock(block.id, { ...imageData, url: e.target.value })}
+                    placeholder="https://example.com/image.jpg or upload below"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          handleImageUpload(block.id, file);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    <Camera className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
               <div>
                 <Label htmlFor={`image-alt-${block.id}`}>Alt Text</Label>
@@ -343,8 +395,19 @@ export default function ExpandedTooltipDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <Dialog 
+      open={open} 
+      onOpenChange={onClose}
+      modal={true}
+    >
+      <DialogContent 
+        className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+      >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-spiritual-700 dark:text-spiritual-300">

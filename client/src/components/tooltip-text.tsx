@@ -74,7 +74,12 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
                     setExpandedTerm(tooltip);
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                   }}
                   className="h-6 px-2 text-xs w-full justify-start"
                 >

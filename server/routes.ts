@@ -11,19 +11,45 @@ import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertAct
 import { z } from "zod";
 
 // Configure multer for portrait uploads
-const uploadsDir = path.join(process.cwd(), 'uploads', 'portraits');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+const portraitsDir = path.join(process.cwd(), 'uploads', 'portraits');
+const imagesDir = path.join(process.cwd(), 'uploads', 'images');
+if (!fs.existsSync(portraitsDir)) {
+  fs.mkdirSync(portraitsDir, { recursive: true });
+}
+if (!fs.existsSync(imagesDir)) {
+  fs.mkdirSync(imagesDir, { recursive: true });
 }
 
-const upload = multer({
+const portraitUpload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, uploadsDir);
+      cb(null, portraitsDir);
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       cb(null, 'portrait-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+const imageUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, imagesDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'image-' + uniqueSuffix + path.extname(file.originalname));
     }
   }),
   fileFilter: (req, file, cb) => {
@@ -77,8 +103,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
-  // Serve uploaded portraits
+  // Serve uploaded files
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+  // Image upload endpoint for enhanced tooltips
+  app.post("/api/upload/image", imageUpload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      const imageUrl = `/uploads/images/${req.file.filename}`;
+      res.json({ url: imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
   // Utility function to check and clean up missing portrait files
   async function cleanupMissingPortraits() {
     try {
@@ -277,7 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload character portrait
-  app.post("/api/character/:id/portrait", upload.single('portrait'), async (req, res) => {
+  app.post("/api/character/:id/portrait", portraitUpload.single('portrait'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No portrait file provided" });
