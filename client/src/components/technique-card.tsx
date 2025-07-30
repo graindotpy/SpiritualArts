@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAudio } from "@/hooks/use-audio";
 import type { Technique, SPEffect } from "@shared/schema";
 
 interface TechniqueCardProps {
@@ -24,6 +25,7 @@ export default function TechniqueCard({
   const [currentSP, setCurrentSP] = useState<number>(0);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const { playHover, playClick } = useAudio();
 
   const spEffects = technique.spEffects as SPEffect;
   const spOptions = Object.keys(spEffects).map(Number).sort((a, b) => a - b);
@@ -139,13 +141,19 @@ export default function TechniqueCard({
         "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700",
         "hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-spiritual-300 hover:shadow-md hover:scale-105"
       )}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        playHover();
+      }}
       onMouseLeave={() => {
         setIsHovered(false);
         document.body.style.overflow = 'unset';
       }}
       onWheel={handleWheel}
-      onClick={handleClick}
+      onClick={() => {
+        playClick();
+        handleClick();
+      }}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
@@ -188,6 +196,7 @@ export default function TechniqueCard({
             variant="ghost"
             onClick={(e) => {
               e.stopPropagation();
+              playClick();
               onEdit(technique);
             }}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
@@ -200,6 +209,7 @@ export default function TechniqueCard({
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
+                playClick();
                 if (confirm(`Are you sure you want to delete "${technique.name}"? This cannot be undone.`)) {
                   onDelete(technique.id);
                 }

@@ -14,6 +14,8 @@ import LevelEditor from "@/components/level-editor";
 import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { useWebSocket } from "@/hooks/use-websocket";
+import { useAudio } from "@/hooks/use-audio";
+import { AudioSettings } from "@/components/audio-settings";
 import SpiritRollNotification from "@/components/spirit-roll-notification";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
@@ -25,6 +27,7 @@ interface CharacterSheetProps {
 
 export default function CharacterSheet({ character, onReturnToMenu }: CharacterSheetProps) {
   const { theme, toggleTheme } = useTheme();
+  const { playClick } = useAudio();
   const [selectedDieIndex, setSelectedDieIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
@@ -202,7 +205,10 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
-                onClick={onReturnToMenu}
+                onClick={() => {
+                  playClick();
+                  onReturnToMenu();
+                }}
                 variant="outline"
                 size="sm"
                 className="flex items-center"
@@ -220,7 +226,10 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
                     {currentCharacter.path} • Level {currentCharacter.level}
                   </p>
                   <Button
-                    onClick={() => setIsLevelEditorOpen(true)}
+                    onClick={() => {
+                      playClick();
+                      setIsLevelEditorOpen(true);
+                    }}
                     variant="ghost"
                     size="sm"
                     className="h-6 px-2 text-xs"
@@ -232,14 +241,20 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
               </div>
             </div>
             
-            <Button
-              onClick={toggleTheme}
-              variant="outline"
-              size="sm"
-              className="p-2"
-            >
-              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              <AudioSettings />
+              <Button
+                onClick={() => {
+                  playClick();
+                  toggleTheme();
+                }}
+                variant="outline"
+                size="sm"
+                className="p-2"
+              >
+                {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -269,7 +284,10 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Techniques</h2>
               <Button
-                onClick={handleAddTechnique}
+                onClick={() => {
+                  playClick();
+                  handleAddTechnique();
+                }}
                 className="bg-spiritual-600 hover:bg-spiritual-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
