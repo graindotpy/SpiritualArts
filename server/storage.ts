@@ -523,18 +523,37 @@ export class DatabaseStorage implements IStorage {
     // First ensure the user exists
     await this.upsertUser({ id: preference.userId });
     
-    const [result] = await db
-      .insert(techniquePreferences)
-      .values(preference)
-      .onConflictDoUpdate({
-        target: [techniquePreferences.userId, techniquePreferences.techniqueId],
-        set: {
+    // Try to find existing preference first
+    const existing = await db
+      .select()
+      .from(techniquePreferences)
+      .where(
+        and(
+          eq(techniquePreferences.userId, preference.userId),
+          eq(techniquePreferences.techniqueId, preference.techniqueId)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing preference
+      const [result] = await db
+        .update(techniquePreferences)
+        .set({
           isMinimized: preference.isMinimized,
           updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return result;
+        })
+        .where(eq(techniquePreferences.id, existing[0].id))
+        .returning();
+      return result;
+    } else {
+      // Create new preference
+      const [result] = await db
+        .insert(techniquePreferences)
+        .values(preference)
+        .returning();
+      return result;
+    }
   }
 }
 
