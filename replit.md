@@ -28,7 +28,10 @@ The application follows a clear separation between frontend and backend:
 ### Fixed Routing and Persistence Issues (January 30, 2025)
 - **RESOLVED: Character Not Found on Refresh** - Fixed routing system to fetch character data from URL parameter instead of relying on in-memory state
 - **CharacterSheetWrapper Component** - Created wrapper component that fetches character data based on URL parameter for proper page refresh handling
-- **Persistent Technique Preferences** - Verified technique minimize/expand states persist across page refreshes using database storage
+- **RESOLVED: Technique Preferences Persistence** - Fixed database schema and storage implementation for reliable minimize/expand state persistence
+- **Database Constraint Resolution** - Fixed foreign key constraints in technique preferences, now requires valid technique IDs from database
+- **Updated Storage Logic** - Implemented proper upsert mechanism using separate select/update/insert flow to handle database constraints
+- **API Testing Verified** - Confirmed technique preferences create, update, and retrieve operations work correctly with real data
 - **Improved Error Handling** - Added loading states and proper error messages for character not found scenarios
 - **URL-Based Navigation** - Character sheets now work correctly when accessed directly via URL or after page refresh
 
