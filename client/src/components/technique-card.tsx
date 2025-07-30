@@ -53,16 +53,10 @@ export default function TechniqueCard({
   // Mutation to update preferences
   const updatePreferenceMutation = useMutation({
     mutationFn: async ({ isMinimized }: { isMinimized: boolean }) => {
-      return apiRequest(`/api/technique-preferences`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          techniqueId: technique.id,
-          isMinimized
-        })
+      return apiRequest(`/api/technique-preferences`, 'POST', {
+        userId,
+        techniqueId: technique.id,
+        isMinimized
       });
     },
     onSuccess: () => {

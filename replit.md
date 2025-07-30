@@ -25,6 +25,13 @@ The application follows a clear separation between frontend and backend:
 
 ## Recent Changes (January 2025)
 
+### Fixed Routing and Persistence Issues (January 30, 2025)
+- **RESOLVED: Character Not Found on Refresh** - Fixed routing system to fetch character data from URL parameter instead of relying on in-memory state
+- **CharacterSheetWrapper Component** - Created wrapper component that fetches character data based on URL parameter for proper page refresh handling
+- **Persistent Technique Preferences** - Verified technique minimize/expand states persist across page refreshes using database storage
+- **Improved Error Handling** - Added loading states and proper error messages for character not found scenarios
+- **URL-Based Navigation** - Character sheets now work correctly when accessed directly via URL or after page refresh
+
 ### Enhanced Animated Die Rolling System (January 30, 2025)
 - **Complete Animated Die Rolling** - Smooth animated dice that roll for 0.75 seconds before showing results
 - **Custom Roll Animations** - CSS keyframes for realistic bouncing and spinning effects at 30% speed
