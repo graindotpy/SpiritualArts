@@ -61,7 +61,7 @@ export default function SpiritDiePoolComponent({
                 </div>
               )}
               {/* Restore button positioned below the die */}
-              <div className="h-6 mt-1 flex items-center">
+              <div className="h-7 mt-2 flex items-center justify-center">
                 {canRestore && (
                   <Button
                     size="sm"

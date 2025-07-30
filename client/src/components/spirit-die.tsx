@@ -39,13 +39,6 @@ export default function SpiritDie({ size, isActive, isSelected, onClick, classNa
           <span className="text-xs text-white font-bold">✓</span>
         </div>
       )}
-      
-      <span className={cn(
-        "absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium",
-        "text-gray-600 dark:text-gray-400"
-      )}>
-        {isActive ? "Active" : "Used"}
-      </span>
     </div>
   );
 }
