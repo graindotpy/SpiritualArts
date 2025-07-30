@@ -318,18 +318,25 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
             </div>
 
             <div className="space-y-4">
-              {techniques.map((technique) => (
-                <TechniqueCard
-                  key={technique.id}
-                  technique={technique}
-                  isSelected={false}
+              {techniquesQuery.isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spiritual-600"></div>
+                  <span className="ml-3 text-gray-600 dark:text-gray-400">Loading techniques...</span>
+                </div>
+              ) : (
+                techniques.map((technique) => (
+                  <TechniqueCard
+                    key={technique.id}
+                    technique={technique}
+                    isSelected={false}
                   onSelect={handleTechniqueSelect}
                   onEdit={() => handleEditTechnique(technique)}
                   onDelete={handleDeleteTechnique}
                 />
-              ))}
+                ))
+              )}
               
-              {techniques.length === 0 && (
+              {!techniquesQuery.isLoading && techniques.length === 0 && (
                 <Card>
                   <CardContent className="text-center py-12">
                     <p className="text-gray-500 dark:text-gray-400">
