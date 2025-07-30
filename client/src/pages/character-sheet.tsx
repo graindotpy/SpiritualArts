@@ -16,6 +16,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { useWebSocket } from "@/hooks/use-websocket";
 import SpiritRollNotification from "@/components/spirit-roll-notification";
+import RollResultNotification from "@/components/roll-result-notification";
 import { SPIRIT_DIE_PROGRESSION } from "@shared/schema";
 import type { Character, Technique, SpiritDiePool, DieSize } from "@shared/schema";
 
@@ -34,6 +35,8 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isRolling, setIsRolling] = useState(false);
   const [rollResult, setRollResult] = useState<number | null>(null);
+  const [rollSuccess, setRollSuccess] = useState<boolean>(true);
+  const [showResultNotification, setShowResultNotification] = useState(false);
 
   // WebSocket for real-time roll notifications
   const { isConnected, lastRollBroadcast } = useWebSocket();
@@ -147,14 +150,23 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           dieIndex: selectedDieIndex 
         });
         setRollResult(result.value);
-        // Stop rolling after animation completes (extended for longer final display)
+        setRollSuccess(result.success);
+        
+        // Stop rolling after animation completes and show result notification
         setTimeout(() => {
           setIsRolling(false);
-          setRollResult(null);
-        }, 3500);
+          setShowResultNotification(true);
+          
+          // Hide result notification after 1 second
+          setTimeout(() => {
+            setShowResultNotification(false);
+            setRollResult(null);
+          }, 1000);
+        }, 750);
       } catch (error) {
         setIsRolling(false);
         setRollResult(null);
+        setShowResultNotification(false);
       }
     }
   };
@@ -365,6 +377,13 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
       <SpiritRollNotification 
         rollData={lastRollBroadcast}
         currentCharacterId={currentCharacter.id}
+      />
+
+      {/* Roll Result Notification */}
+      <RollResultNotification
+        result={rollResult}
+        success={rollSuccess}
+        isVisible={showResultNotification}
       />
     </div>
   );

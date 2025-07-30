@@ -34,13 +34,8 @@ export default function SpiritDiePoolComponent({
 }: SpiritDiePoolProps) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-4">
+      <div className="text-center mb-4">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Current Spirit Die Pool</h3>
-        {currentDice.length > 1 && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            Click to select die for rolling
-          </span>
-        )}
       </div>
       
       <div className="flex items-start justify-center space-x-4 mt-4">

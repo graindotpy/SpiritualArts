@@ -37,23 +37,16 @@ export default function AnimatedDie({
       setCurrentValue(Math.floor(Math.random() * maxValue) + 1);
     }, 150);
 
-    // Stop rolling after 2 seconds and show final result
+    // Stop rolling after 0.75 seconds and show final result
     const rollTimeout = setTimeout(() => {
       clearInterval(rollInterval);
       setAnimationClass("");
       
       if (finalResult !== undefined) {
         setCurrentValue(finalResult);
-        // Show final result with gentle pulse
-        setTimeout(() => {
-          setAnimationClass("animate-pulse");
-          setTimeout(() => {
-            setAnimationClass("");
-            onRollComplete?.(finalResult);
-          }, 1000);
-        }, 100);
+        onRollComplete?.(finalResult);
       }
-    }, 2000);
+    }, 750);
 
     return () => {
       clearInterval(rollInterval);
