@@ -7,7 +7,7 @@ import fs from "fs";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { db } from "./db";
-import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, type DieSize } from "@shared/schema";
+import { characters, insertTechniqueSchema, insertSpiritDiePoolSchema, insertActiveEffectSchema, insertGlossaryTermSchema, type DieSize } from "@shared/schema";
 import { z } from "zod";
 
 // Configure multer for portrait uploads
@@ -572,6 +572,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete active effect" });
+    }
+  });
+
+  // Glossary routes
+  app.get("/api/character/:id/glossary", async (req, res) => {
+    try {
+      const terms = await storage.getGlossaryTerms(req.params.id);
+      res.json(terms);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get glossary terms" });
+    }
+  });
+
+  app.post("/api/character/:id/glossary", async (req, res) => {
+    try {
+      const validatedData = insertGlossaryTermSchema.parse({
+        ...req.body,
+        characterId: req.params.id
+      });
+      const term = await storage.createGlossaryTerm(validatedData);
+      res.json(term);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create glossary term" });
+    }
+  });
+
+  app.put("/api/glossary/:id", async (req, res) => {
+    try {
+      const validatedData = insertGlossaryTermSchema.partial().parse(req.body);
+      const updated = await storage.updateGlossaryTerm(req.params.id, validatedData);
+      if (!updated) {
+        return res.status(404).json({ message: "Glossary term not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update glossary term" });
+    }
+  });
+
+  app.delete("/api/glossary/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteGlossaryTerm(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Glossary term not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete glossary term" });
     }
   });
 

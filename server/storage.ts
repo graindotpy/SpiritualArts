@@ -3,6 +3,7 @@ import {
   spiritDiePools,
   techniques,
   activeEffects,
+  glossaryTerms,
   type Character, 
   type InsertCharacter,
   type SpiritDiePool,
@@ -11,6 +12,8 @@ import {
   type InsertTechnique,
   type ActiveEffect,
   type InsertActiveEffect,
+  type GlossaryTerm,
+  type InsertGlossaryTerm,
   type DieSize,
   SPIRIT_DIE_PROGRESSION
 } from "@shared/schema";
@@ -42,6 +45,12 @@ export interface IStorage {
   createActiveEffect(effect: InsertActiveEffect): Promise<ActiveEffect>;
   updateActiveEffect(id: string, effect: Partial<ActiveEffect>): Promise<ActiveEffect | undefined>;
   deleteActiveEffect(id: string): Promise<boolean>;
+
+  // Glossary Terms
+  getGlossaryTerms(characterId: string): Promise<GlossaryTerm[]>;
+  createGlossaryTerm(term: InsertGlossaryTerm): Promise<GlossaryTerm>;
+  updateGlossaryTerm(id: string, term: Partial<GlossaryTerm>): Promise<GlossaryTerm | undefined>;
+  deleteGlossaryTerm(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -359,6 +368,33 @@ export class DatabaseStorage implements IStorage {
 
   async deleteActiveEffect(id: string): Promise<boolean> {
     const result = await db.delete(activeEffects).where(eq(activeEffects.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Glossary Terms
+  async getGlossaryTerms(characterId: string): Promise<GlossaryTerm[]> {
+    return await db.select().from(glossaryTerms).where(eq(glossaryTerms.characterId, characterId));
+  }
+
+  async createGlossaryTerm(term: InsertGlossaryTerm): Promise<GlossaryTerm> {
+    const [newTerm] = await db
+      .insert(glossaryTerms)
+      .values(term)
+      .returning();
+    return newTerm;
+  }
+
+  async updateGlossaryTerm(id: string, term: Partial<GlossaryTerm>): Promise<GlossaryTerm | undefined> {
+    const [updated] = await db
+      .update(glossaryTerms)
+      .set(term)
+      .where(eq(glossaryTerms.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteGlossaryTerm(id: string): Promise<boolean> {
+    const result = await db.delete(glossaryTerms).where(eq(glossaryTerms.id, id));
     return (result.rowCount || 0) > 0;
   }
 }

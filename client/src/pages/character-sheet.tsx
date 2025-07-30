@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Home, Moon, Sun, TrendingUp } from "lucide-react";
+import { Plus, Home, Moon, Sun, TrendingUp, BookOpen } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import SpiritDiePoolComponent from "@/components/spirit-die-pool";
@@ -11,6 +11,7 @@ import TechniqueEditor from "@/components/technique-editor";
 import SpiritDieOverride from "@/components/spirit-die-override";
 import EditableCharacterHeader from "@/components/editable-character-header";
 import LevelEditor from "@/components/level-editor";
+import GlossaryDialog from "@/components/glossary-dialog";
 import { useTheme } from "@/components/theme-provider";
 import { useCharacterState } from "@/hooks/use-character-state";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -30,6 +31,7 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
   const [editingTechnique, setEditingTechnique] = useState<Technique | null>(null);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
   const [isLevelEditorOpen, setIsLevelEditorOpen] = useState(false);
+  const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
 
   // WebSocket for real-time roll notifications
   const { isConnected, lastRollBroadcast } = useWebSocket();
@@ -268,13 +270,23 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Techniques</h2>
-              <Button
-                onClick={handleAddTechnique}
-                className="bg-spiritual-600 hover:bg-spiritual-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Technique
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => setIsGlossaryOpen(true)} 
+                  variant="outline"
+                  className="border-spiritual-600 text-spiritual-600 hover:bg-spiritual-50 dark:border-spiritual-400 dark:text-spiritual-400 dark:hover:bg-spiritual-900"
+                >
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Glossary
+                </Button>
+                <Button
+                  onClick={handleAddTechnique}
+                  className="bg-spiritual-600 hover:bg-spiritual-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Technique
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -322,6 +334,13 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           character={currentCharacter}
           isOpen={isLevelEditorOpen}
           onClose={() => setIsLevelEditorOpen(false)}
+        />
+        
+        {/* Glossary Dialog */}
+        <GlossaryDialog
+          open={isGlossaryOpen}
+          characterId={currentCharacter.id}
+          onClose={() => setIsGlossaryOpen(false)}
         />
 
       </main>

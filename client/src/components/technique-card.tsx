@@ -168,7 +168,7 @@ export default function TechniqueCard({
           
           <TooltipText 
             text={technique.triggerDescription}
-            tooltips={technique.tooltips || []}
+            characterId={technique.characterId}
             className="text-sm text-gray-600 dark:text-gray-300 mb-4"
           />
           
@@ -180,7 +180,7 @@ export default function TechniqueCard({
               </h5>
               <TooltipText 
                 text={spEffects[currentSP].effect}
-                tooltips={technique.tooltips || []}
+                characterId={technique.characterId}
                 className="text-sm text-gray-700 dark:text-gray-300"
               />
             </div>

@@ -1,25 +1,27 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-interface TooltipKeyword {
-  keyword: string;
-  definition: string;
-}
+import type { GlossaryTerm } from "@shared/schema";
 
 interface TooltipTextProps {
   text: string;
-  tooltips: TooltipKeyword[];
+  characterId: string;
   className?: string;
 }
 
-export default function TooltipText({ text, tooltips, className }: TooltipTextProps) {
-  if (!tooltips || tooltips.length === 0) {
+export default function TooltipText({ text, characterId, className }: TooltipTextProps) {
+  const { data: glossaryTerms = [] } = useQuery({
+    queryKey: ["/api/character", characterId, "glossary"],
+    enabled: !!characterId,
+  });
+
+  if (!glossaryTerms || glossaryTerms.length === 0) {
     return <div className={className}>{text}</div>;
   }
 
   // Create a regex pattern to match all keywords (case-insensitive)
   const keywordPattern = new RegExp(
-    `\\b(${tooltips.map(t => t.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
+    `\\b(${glossaryTerms.map((t: GlossaryTerm) => t.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
     'gi'
   );
 
@@ -34,7 +36,7 @@ export default function TooltipText({ text, tooltips, className }: TooltipTextPr
     }
 
     // Find the tooltip definition for this keyword
-    const tooltip = tooltips.find(t => 
+    const tooltip = glossaryTerms.find((t: GlossaryTerm) => 
       t.keyword.toLowerCase() === match[0].toLowerCase()
     );
 
@@ -84,4 +86,3 @@ export default function TooltipText({ text, tooltips, className }: TooltipTextPr
   );
 }
 
-export type { TooltipKeyword };

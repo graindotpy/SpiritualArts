@@ -17,10 +17,7 @@ interface TechniqueEditorProps {
   characterId: string;
 }
 
-interface TooltipKeyword {
-  keyword: string;
-  definition: string;
-}
+
 
 interface SPEffectEntry {
   sp: number;
@@ -38,7 +35,7 @@ export default function TechniqueEditor({
 }: TechniqueEditorProps) {
   const [name, setName] = useState("");
   const [triggerDescription, setTriggerDescription] = useState("");
-  const [tooltips, setTooltips] = useState<TooltipKeyword[]>([]);
+
   const [spEffects, setSPEffects] = useState<SPEffectEntry[]>([]);
 
   const { createTechnique, updateTechnique } = useCharacterState(characterId);
@@ -48,7 +45,7 @@ export default function TechniqueEditor({
     if (technique) {
       setName(technique.name);
       setTriggerDescription(technique.triggerDescription);
-      setTooltips(technique.tooltips || []);
+
       
       const effects = technique.spEffects as SPEffect;
       const entries: SPEffectEntry[] = Object.entries(effects).map(([sp, effectData]) => ({
@@ -63,7 +60,6 @@ export default function TechniqueEditor({
       // Reset form for new technique
       setName("");
       setTriggerDescription("");
-      setTooltips([]);
       setSPEffects([{ sp: 1, effect: "", actionType: "action", enabled: true, alternateName: "" }]);
     }
   }, [technique]);
@@ -83,19 +79,7 @@ export default function TechniqueEditor({
     setSPEffects(updated);
   };
 
-  const handleAddTooltip = () => {
-    setTooltips([...tooltips, { keyword: "", definition: "" }]);
-  };
 
-  const handleRemoveTooltip = (index: number) => {
-    setTooltips(tooltips.filter((_, i) => i !== index));
-  };
-
-  const handleTooltipChange = (index: number, field: keyof TooltipKeyword, value: string) => {
-    const updated = [...tooltips];
-    updated[index] = { ...updated[index], [field]: value };
-    setTooltips(updated);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,8 +98,7 @@ export default function TechniqueEditor({
     const techniqueData = {
       name,
       triggerDescription,
-      spEffects: spEffectsObj,
-      tooltips: tooltips.filter(t => t.keyword.trim() && t.definition.trim())
+      spEffects: spEffectsObj
     };
 
     try {
@@ -260,61 +243,7 @@ export default function TechniqueEditor({
             </div>
           </div>
 
-          {/* Tooltip Keywords Section */}
-          <div>
-            <Label className="block mb-4">Tooltip Keywords</Label>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Define keywords that will show detailed explanations when hovered over in the technique description.
-            </p>
-            <div className="space-y-3">
-              {tooltips.map((tooltip, index) => (
-                <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-[var(--dialog-section)]">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <Label className="text-sm text-gray-700 dark:text-gray-300">Keyword</Label>
-                        <Input
-                          value={tooltip.keyword}
-                          onChange={(e) => handleTooltipChange(index, 'keyword', e.target.value)}
-                          placeholder="e.g., Technique Drain"
-                          className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm text-gray-700 dark:text-gray-300">Definition</Label>
-                        <Textarea
-                          value={tooltip.definition}
-                          onChange={(e) => handleTooltipChange(index, 'definition', e.target.value)}
-                          placeholder="Detailed explanation of this keyword..."
-                          className="bg-white dark:bg-[var(--dialog-input)] border-gray-300 dark:border-[var(--dialog-input-border)] text-gray-900 dark:text-gray-100"
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveTooltip(index)}
-                      className="text-red-600 hover:text-red-800 h-auto p-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddTooltip}
-                className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-spiritual-400 hover:text-spiritual-600 dark:hover:border-spiritual-500 dark:hover:text-spiritual-400"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Add Tooltip Keyword
-              </Button>
-            </div>
-          </div>
+
           
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-600">
             <Button type="button" variant="secondary" onClick={onClose}>

@@ -24,8 +24,14 @@ export const techniques = pgTable("techniques", {
   name: text("name").notNull(),
   triggerDescription: text("trigger_description").notNull(),
   spEffects: jsonb("sp_effects").notNull(), // Object mapping SP amounts to { effect, actionType }
-  tooltips: jsonb("tooltips").$type<Array<{ keyword: string; definition: string }>>().default([]),
   isActive: boolean("is_active").notNull().default(true),
+});
+
+export const glossaryTerms = pgTable("glossary_terms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  characterId: varchar("character_id").notNull(),
+  keyword: text("keyword").notNull(),
+  definition: text("definition").notNull(),
 });
 
 export const activeEffects = pgTable("active_effects", {
@@ -53,6 +59,10 @@ export const insertActiveEffectSchema = createInsertSchema(activeEffects).omit({
   id: true,
 });
 
+export const insertGlossaryTermSchema = createInsertSchema(glossaryTerms).omit({
+  id: true,
+});
+
 // Types
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
@@ -65,6 +75,9 @@ export type InsertTechnique = z.infer<typeof insertTechniqueSchema>;
 
 export type ActiveEffect = typeof activeEffects.$inferSelect;
 export type InsertActiveEffect = z.infer<typeof insertActiveEffectSchema>;
+
+export type GlossaryTerm = typeof glossaryTerms.$inferSelect;
+export type InsertGlossaryTerm = z.infer<typeof insertGlossaryTermSchema>;
 
 // Additional types for frontend
 export type DieSize = 'd4' | 'd6' | 'd8' | 'd10' | 'd12';
