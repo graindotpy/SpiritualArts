@@ -25,6 +25,18 @@ The application follows a clear separation between frontend and backend:
 
 ## Recent Changes (January 2025)
 
+### Enhanced Animated Die Rolling System (January 30, 2025)
+- **Complete Animated Die Rolling** - Smooth animated dice that roll for 0.75 seconds before showing results
+- **Custom Roll Animations** - CSS keyframes for realistic bouncing and spinning effects at 30% speed
+- **Success/Failure Notifications** - Bottom-right notification box appears after animation completes
+- **Auto-hiding Results** - Notification disappears after 1 second automatically
+- **Stable Layout Design** - Fixed container sizes prevent dice shifting when restore buttons appear
+- **Centered Interface** - "Current Spirit Die Pool" title centered above dice with cleaner layout
+- **Optimized Timing** - Animation, notification, and database refresh perfectly synchronized
+- **Visual Polish** - Enhanced with proper success/failure colors and smooth transitions
+
+## Recent Changes (January 2025)
+
 ### Enhanced Expandable Tooltip System (January 30, 2025)
 - **Complete Expandable Tooltip Implementation** - Two-tier tooltip system with basic hover and enhanced modal views
 - Database schema enhanced with `expandedContent` and `hasExpandedContent` fields for rich content storage

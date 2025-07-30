@@ -52,7 +52,7 @@ export default function SpiritDiePoolComponent({
                     <AnimatedDie
                       size={currentDie}
                       isRolling={isRolling}
-                      finalResult={rollResult}
+                      finalResult={rollResult ?? undefined}
                       onRollComplete={() => {}} // Animation handled by parent
                     />
                   ) : (
