@@ -47,17 +47,22 @@ export default function TechniqueCard({
   // Query user preferences
   const { data: preferences = [] } = useQuery<TechniquePreference[]>({
     queryKey: ['/api/technique-preferences', userId],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/technique-preferences/${userId}`);
+      return response.json();
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Mutation to update preferences
   const updatePreferenceMutation = useMutation({
     mutationFn: async ({ isMinimized }: { isMinimized: boolean }) => {
-      return apiRequest(`/api/technique-preferences`, 'POST', {
+      const response = await apiRequest('POST', `/api/technique-preferences`, {
         userId,
         techniqueId: technique.id,
         isMinimized
       });
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -80,12 +85,9 @@ export default function TechniqueCard({
   useEffect(() => {
     const preference = preferences.find(p => p.techniqueId === technique.id);
     if (preference) {
-      console.log(`Setting ${technique.name} minimized state to:`, preference.isMinimized);
       setIsMinimized(preference.isMinimized);
-    } else {
-      console.log(`No preference found for ${technique.name}, keeping default state`);
     }
-  }, [preferences, technique.id, technique.name]);
+  }, [preferences, technique.id]);
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!isHovered || spOptions.length === 0) return;
