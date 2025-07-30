@@ -480,8 +480,8 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Create and export storage instance (using in-memory storage for now)
-export const storage = new MemStorage();
+// Create and export storage instance (using database storage)
+export const storage = new DatabaseStorage();
 
 // Initialize database with default character data
 async function initializeDatabase() {
@@ -544,8 +544,5 @@ async function initializeDatabase() {
   }
 }
 
-// Commented out database storage for now - using in-memory storage instead
-// export const storage = new DatabaseStorage();
-
-// Initialize on startup (commented out for now)
-// initializeDatabase();
+// Initialize database on startup
+initializeDatabase();
