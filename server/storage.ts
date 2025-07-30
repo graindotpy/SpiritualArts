@@ -72,15 +72,46 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeDefaultData() {
-    const character = await this.createCharacter({
+    // Create R'aan Fames with the expected ID and level
+    const raanFames = await this.createCharacterWithId("2167178a-df9f-4f08-8d94-05b342dfcef1", {
       name: "R'aan Fames",
       path: "Path of Gluttony",
-      level: 3
+      level: 9,
+      portraitUrl: "/uploads/portraits/portrait-1753820547027-209797711.jpg"
+    });
+
+    // Create Azuma
+    const azuma = await this.createCharacterWithId("50cf2e2f-d76d-452d-8f70-da84c2aadbd4", {
+      name: "Azuma",
+      path: "Hiroshi-Do", 
+      level: 9,
+      portraitUrl: "/uploads/portraits/portrait-1753823004361-578891944.jpg"
+    });
+
+    // Create Yorinaga Masashige
+    const yorinaga = await this.createCharacterWithId("d0efdf5f-c9f2-4803-8488-4e757d37a202", {
+      name: "Yorinaga Masashige",
+      path: "Path of the Spiteful Dragon",
+      level: 9,
+      portraitUrl: null
+    });
+
+    // Create spirit die pools for all characters
+    await this.createSpiritDiePool({
+      characterId: raanFames.id,
+      currentDice: ["d6", "d6"], // Level 9 dice
+      overrideDice: null
     });
 
     await this.createSpiritDiePool({
-      characterId: character.id,
-      currentDice: ["d4", "d4"],
+      characterId: azuma.id,
+      currentDice: ["d6", "d6"], // Level 9 dice
+      overrideDice: null
+    });
+
+    await this.createSpiritDiePool({
+      characterId: yorinaga.id,
+      currentDice: ["d6", "d6"], // Level 9 dice
       overrideDice: null
     });
 
@@ -125,9 +156,10 @@ export class MemStorage implements IStorage {
       }
     ];
 
+    // Create techniques for R'aan Fames
     for (const tech of techniques) {
       await this.createTechnique({
-        characterId: character.id,
+        characterId: raanFames.id,
         ...tech
       });
     }
@@ -140,6 +172,18 @@ export class MemStorage implements IStorage {
 
   async createCharacter(character: InsertCharacter): Promise<Character> {
     const id = randomUUID();
+    const newCharacter: Character = { 
+      ...character, 
+      id,
+      level: character.level ?? 3,
+      portraitUrl: character.portraitUrl ?? null
+    };
+    this.characters.set(id, newCharacter);
+    return newCharacter;
+  }
+
+  // Helper method to create character with specific ID (for data restoration)
+  private async createCharacterWithId(id: string, character: InsertCharacter): Promise<Character> {
     const newCharacter: Character = { 
       ...character, 
       id,
