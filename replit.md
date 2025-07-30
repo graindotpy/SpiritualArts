@@ -35,6 +35,14 @@ The application follows a clear separation between frontend and backend:
 - **Optimized Timing** - Animation, notification, and database refresh perfectly synchronized
 - **Visual Polish** - Enhanced with proper success/failure colors and smooth transitions
 
+### Compact Technique Card Design (January 30, 2025)
+- **Minimize/Expand Functionality** - Chevron button to collapse techniques showing only essential information
+- **Horizontal Button Layout** - Edit, delete, and expand buttons arranged in a single row for space efficiency
+- **Compact Padding** - Reduced card padding from 6 to 4 for better space utilization
+- **Always-Visible SP Badge** - SP investment level displayed next to action type badge
+- **Streamlined Interface** - Removed circular SP selection icons for cleaner, more compact design
+- **Enhanced Content Styling** - Fixed text area styling to match theme with proper gray backgrounds
+
 ## Recent Changes (January 2025)
 
 ### Enhanced Expandable Tooltip System (January 30, 2025)

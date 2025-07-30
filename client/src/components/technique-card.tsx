@@ -144,7 +144,7 @@ export default function TechniqueCard({
     <div
       ref={cardRef}
       className={cn(
-        "p-6 transition-all duration-200 cursor-pointer group border-2 rounded-lg",
+        "p-4 transition-all duration-200 cursor-pointer group border-2 rounded-lg",
         "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700",
         "hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-spiritual-300 hover:shadow-md hover:scale-105"
       )}
@@ -156,44 +156,65 @@ export default function TechniqueCard({
       onWheel={handleWheel}
       onClick={handleClick}
     >
-      <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-3">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-spiritual-600">
-              {currentSP > 0 && spEffects[currentSP]?.alternateName ? spEffects[currentSP].alternateName : technique.name}
-            </h4>
-            {currentSP > 0 && spEffects[currentSP] && (
-              <Badge className={getTriggerColor(spEffects[currentSP].actionType)}>
-                {formatTriggerType(spEffects[currentSP].actionType)}
-              </Badge>
-            )}
-            {isHovered && currentSP > 0 && (
-              <Badge className="bg-spiritual-100 text-spiritual-800 dark:bg-spiritual-800 dark:text-spiritual-200">
-                {currentSP} SP
-              </Badge>
-            )}
-          </div>
-
-          {/* Investment Level Icons - Always visible */}
-          <div className="flex items-center space-x-1 mb-3">
-            {spOptions.map((sp) => (
-              <div
-                key={sp}
-                className={cn(
-                  "w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer transition-all",
-                  currentSP === sp
-                    ? "bg-spiritual-600 border-spiritual-600 text-white"
-                    : "bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
-                )}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-3">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-spiritual-600">
+                {currentSP > 0 && spEffects[currentSP]?.alternateName ? spEffects[currentSP].alternateName : technique.name}
+              </h4>
+              {currentSP > 0 && spEffects[currentSP] && (
+                <Badge className={getTriggerColor(spEffects[currentSP].actionType)}>
+                  {formatTriggerType(spEffects[currentSP].actionType)}
+                </Badge>
+              )}
+              {currentSP > 0 && (
+                <Badge className="bg-spiritual-100 text-spiritual-800 dark:bg-spiritual-800 dark:text-spiritual-200">
+                  {currentSP} SP
+                </Badge>
+              )}
+            </div>
+            
+            {/* Action buttons */}
+            <div className="flex items-center space-x-1">
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setCurrentSP(sp);
+                  setIsMinimized(!isMinimized);
                 }}
-                title={`${sp} SP Investment`}
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
+                title={isMinimized ? "Expand technique" : "Minimize technique"}
               >
-                {sp}
-              </div>
-            ))}
+                {isMinimized ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(technique);
+                }}
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+              {onDelete && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm(`Are you sure you want to delete "${technique.name}"? This cannot be undone.`)) {
+                      onDelete(technique.id);
+                    }
+                  }}
+                  className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 h-auto p-1"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
           
           {/* Expandable Content */}
@@ -202,12 +223,12 @@ export default function TechniqueCard({
               <TooltipText 
                 text={technique.triggerDescription}
                 characterId={technique.characterId}
-                className="text-sm text-gray-600 dark:text-gray-300 mb-4"
+                className="text-sm text-gray-600 dark:text-gray-300 mb-3"
               />
               
               {/* Dynamic Effect Display */}
               {currentSP > 0 && spEffects[currentSP] && (
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                   <h5 className="font-medium text-gray-900 dark:text-white mb-2">
                     Effect ({currentSP} SP Investment):
                   </h5>
@@ -221,48 +242,6 @@ export default function TechniqueCard({
             </>
           )}
         </div>
-        
-        <div className="ml-4 flex flex-col space-y-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMinimized(!isMinimized);
-            }}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
-            title={isMinimized ? "Expand technique" : "Minimize technique"}
-          >
-            {isMinimized ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(technique);
-            }}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
-          >
-            <Edit className="w-5 h-5" />
-          </Button>
-          {onDelete && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (confirm(`Are you sure you want to delete "${technique.name}"? This cannot be undone.`)) {
-                  onDelete(technique.id);
-                }
-              }}
-              className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 h-auto p-1"
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
