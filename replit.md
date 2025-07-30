@@ -30,8 +30,9 @@ The application follows a clear separation between frontend and backend:
 - **CharacterSheetWrapper Component** - Created wrapper component that fetches character data based on URL parameter for proper page refresh handling
 - **RESOLVED: Technique Preferences Persistence** - Fixed database schema and storage implementation for reliable minimize/expand state persistence
 - **Database Constraint Resolution** - Fixed foreign key constraints in technique preferences, now requires valid technique IDs from database
-- **Updated Storage Logic** - Implemented proper upsert mechanism using separate select/update/insert flow to handle database constraints
-- **API Testing Verified** - Confirmed technique preferences create, update, and retrieve operations work correctly with real data
+- **Updated Storage Logic** - Implemented proper upsert mechanism using separate select/update/insert flow to handle database constraints  
+- **RESOLVED: Frontend API Integration** - Fixed API request parameter order in technique card component (method first, then URL)
+- **Complete End-to-End Functionality** - Technique minimize/expand states now persist correctly across page refreshes and browser sessions
 - **Improved Error Handling** - Added loading states and proper error messages for character not found scenarios
 - **URL-Based Navigation** - Character sheets now work correctly when accessed directly via URL or after page refresh
 
