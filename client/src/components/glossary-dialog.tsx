@@ -11,12 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 import type { GlossaryTerm, InsertGlossaryTerm } from "@shared/schema";
 
 interface GlossaryDialogProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   characterId: string;
 }
 
-export default function GlossaryDialog({ isOpen, onClose, characterId }: GlossaryDialogProps) {
+export default function GlossaryDialog({ open, onClose, characterId }: GlossaryDialogProps) {
   const [newKeyword, setNewKeyword] = useState("");
   const [newDefinition, setNewDefinition] = useState("");
   const [editingTerm, setEditingTerm] = useState<GlossaryTerm | null>(null);
@@ -28,7 +28,7 @@ export default function GlossaryDialog({ isOpen, onClose, characterId }: Glossar
 
   const { data: glossaryTerms = [], isLoading } = useQuery({
     queryKey: ["/api/character", characterId, "glossary"],
-    enabled: isOpen && !!characterId,
+    enabled: open && !!characterId,
   });
 
   const createTerm = useMutation({
@@ -134,7 +134,7 @@ export default function GlossaryDialog({ isOpen, onClose, characterId }: Glossar
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[var(--dialog-background)] text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
