@@ -401,7 +401,7 @@ export default function ExpandedTooltipDialog({
       modal={true}
     >
       <DialogContent 
-        className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 duration-300"
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
