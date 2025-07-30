@@ -172,7 +172,7 @@ export default function ExpandedTooltipDialog({
               onChange={(e) => updateContentBlock(block.id, e.target.value)}
               placeholder="Enter detailed text content..."
               rows={4}
-              className="bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+              className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
           </div>
         ) : (
@@ -471,7 +471,7 @@ export default function ExpandedTooltipDialog({
         <div className="space-y-6">
           {/* Basic Definition */}
           <Card>
-            <CardContent className="p-4 bg-[#374151]">
+            <CardContent className="p-4 bg-gray-50 dark:bg-gray-800">
               <h3 className="font-semibold mb-2 text-spiritual-600 dark:text-spiritual-400">
                 Basic Definition
               </h3>
@@ -541,7 +541,7 @@ export default function ExpandedTooltipDialog({
               <div className="space-y-6">
                 {contentBlocks.map((block) => (
                   <Card key={block.id}>
-                    <CardContent className="p-4 bg-[#374151]">
+                    <CardContent className="p-4 bg-gray-50 dark:bg-gray-800">
                       {renderContentBlock(block, isEditing)}
                     </CardContent>
                   </Card>
