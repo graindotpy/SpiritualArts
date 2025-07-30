@@ -32,6 +32,8 @@ export const glossaryTerms = pgTable("glossary_terms", {
   characterId: varchar("character_id").notNull(),
   keyword: text("keyword").notNull(),
   definition: text("definition").notNull(),
+  expandedContent: text("expanded_content"), // Rich content for expanded view
+  hasExpandedContent: boolean("has_expanded_content").default(false).notNull(),
 });
 
 export const activeEffects = pgTable("active_effects", {

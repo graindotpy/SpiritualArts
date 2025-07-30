@@ -107,6 +107,8 @@ export default function GlossaryDialog({ open, onClose, characterId }: GlossaryD
       characterId,
       keyword: newKeyword.trim(),
       definition: newDefinition.trim(),
+      expandedContent: null,
+      hasExpandedContent: false,
     });
   };
 

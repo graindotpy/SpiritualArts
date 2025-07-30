@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Maximize2 } from "lucide-react";
+import ExpandedTooltipDialog from "./expanded-tooltip-dialog";
 import type { GlossaryTerm } from "@shared/schema";
 
 interface TooltipTextProps {
@@ -10,7 +13,9 @@ interface TooltipTextProps {
 }
 
 export default function TooltipText({ text, characterId, className }: TooltipTextProps) {
-  const { data: glossaryTerms = [] } = useQuery({
+  const [expandedTerm, setExpandedTerm] = useState<GlossaryTerm | null>(null);
+  
+  const { data: glossaryTerms = [] } = useQuery<GlossaryTerm[]>({
     queryKey: ["/api/character", characterId, "glossary"],
     enabled: !!characterId,
   });
@@ -21,7 +26,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
 
   // Create a regex pattern to match all keywords (case-insensitive)
   const keywordPattern = new RegExp(
-    `\\b(${glossaryTerms.map((t: GlossaryTerm) => t.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
+    `\\b(${glossaryTerms.map((t) => t.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
     'gi'
   );
 
@@ -36,8 +41,8 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
     }
 
     // Find the tooltip definition for this keyword
-    const tooltip = glossaryTerms.find((t: GlossaryTerm) => 
-      t.keyword.toLowerCase() === match[0].toLowerCase()
+    const tooltip = glossaryTerms.find((t) => 
+      t.keyword.toLowerCase() === match![0].toLowerCase()
     );
 
     if (tooltip) {
@@ -46,7 +51,7 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
               <span className="text-spiritual-600 dark:text-spiritual-400 underline decoration-dotted cursor-help font-medium">
-                {match[0]}
+                {match![0]}
               </span>
             </TooltipTrigger>
             <TooltipContent 
@@ -60,16 +65,31 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
                 <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                   {tooltip.definition}
                 </p>
+                {tooltip.hasExpandedContent && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setExpandedTerm(tooltip);
+                    }}
+                    className="h-6 px-2 text-xs w-full justify-start"
+                  >
+                    <Maximize2 className="w-3 h-3 mr-1" />
+                    View Enhanced Details
+                  </Button>
+                )}
               </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       );
     } else {
-      parts.push(match[0]);
+      parts.push(match![0]);
     }
 
-    lastIndex = match.index + match[0].length;
+    lastIndex = match!.index + match![0].length;
   }
 
   // Add remaining text
@@ -78,11 +98,22 @@ export default function TooltipText({ text, characterId, className }: TooltipTex
   }
 
   return (
-    <div className={`${className} whitespace-pre-line`}>
-      {parts.map((part, index) => (
-        typeof part === 'string' ? part : <span key={index}>{part}</span>
-      ))}
-    </div>
+    <>
+      <div className={`${className} whitespace-pre-line`}>
+        {parts.map((part, index) => (
+          typeof part === 'string' ? part : <span key={index}>{part}</span>
+        ))}
+      </div>
+      
+      {expandedTerm && (
+        <ExpandedTooltipDialog
+          open={!!expandedTerm}
+          onClose={() => setExpandedTerm(null)}
+          term={expandedTerm}
+          characterId={characterId}
+        />
+      )}
+    </>
   );
 }
 
