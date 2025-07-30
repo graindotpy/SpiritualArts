@@ -541,7 +541,7 @@ export default function ExpandedTooltipDialog({
               <div className="space-y-6">
                 {contentBlocks.map((block) => (
                   <Card key={block.id}>
-                    <CardContent className="p-4">
+                    <CardContent className="p-4 bg-[#374151]">
                       {renderContentBlock(block, isEditing)}
                     </CardContent>
                   </Card>
