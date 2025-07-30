@@ -168,7 +168,7 @@ export default function TechniqueCard({
                 </Badge>
               )}
               {currentSP > 0 && (
-                <Badge className="bg-spiritual-100 text-spiritual-800 dark:bg-spiritual-900 dark:text-spiritual-300">
+                <Badge className="dark:bg-spiritual-900 dark:text-spiritual-300 bg-[#40177d] text-[#ffffff]">
                   {currentSP} SP
                 </Badge>
               )}
