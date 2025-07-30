@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TooltipText from "./tooltip-text";
 import { useTooltipContext } from "@/contexts/tooltip-context";
@@ -25,6 +25,7 @@ export default function TechniqueCard({
 }: TechniqueCardProps) {
   const [currentSP, setCurrentSP] = useState<number>(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const { isEnhancedTooltipOpen } = useTooltipContext();
 
@@ -167,34 +168,73 @@ export default function TechniqueCard({
               </Badge>
             )}
             {isHovered && currentSP > 0 && (
-              <Badge className="bg-spiritual-100 text-spiritual-800">
+              <Badge className="bg-spiritual-100 text-spiritual-800 dark:bg-spiritual-800 dark:text-spiritual-200">
                 {currentSP} SP
               </Badge>
             )}
           </div>
+
+          {/* Investment Level Icons - Always visible */}
+          <div className="flex items-center space-x-1 mb-3">
+            {spOptions.map((sp) => (
+              <div
+                key={sp}
+                className={cn(
+                  "w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer transition-all",
+                  currentSP === sp
+                    ? "bg-spiritual-600 border-spiritual-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentSP(sp);
+                }}
+                title={`${sp} SP Investment`}
+              >
+                {sp}
+              </div>
+            ))}
+          </div>
           
-          <TooltipText 
-            text={technique.triggerDescription}
-            characterId={technique.characterId}
-            className="text-sm text-gray-600 dark:text-gray-300 mb-4"
-          />
-          
-          {/* Dynamic Effect Display */}
-          {currentSP > 0 && spEffects[currentSP] && (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <h5 className="font-medium text-gray-900 dark:text-white mb-2">
-                Effect ({currentSP} SP Investment):
-              </h5>
+          {/* Expandable Content */}
+          {!isMinimized && (
+            <>
               <TooltipText 
-                text={spEffects[currentSP].effect}
+                text={technique.triggerDescription}
                 characterId={technique.characterId}
-                className="text-sm text-gray-700 dark:text-gray-300"
+                className="text-sm text-gray-600 dark:text-gray-300 mb-4"
               />
-            </div>
+              
+              {/* Dynamic Effect Display */}
+              {currentSP > 0 && spEffects[currentSP] && (
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                  <h5 className="font-medium text-gray-900 dark:text-white mb-2">
+                    Effect ({currentSP} SP Investment):
+                  </h5>
+                  <TooltipText 
+                    text={spEffects[currentSP].effect}
+                    characterId={technique.characterId}
+                    className="text-sm text-gray-700 dark:text-gray-300"
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
         
         <div className="ml-4 flex flex-col space-y-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMinimized(!isMinimized);
+            }}
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto p-1"
+            title={isMinimized ? "Expand technique" : "Minimize technique"}
+          >
+            {isMinimized ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+          </Button>
           <Button
             size="sm"
             variant="ghost"

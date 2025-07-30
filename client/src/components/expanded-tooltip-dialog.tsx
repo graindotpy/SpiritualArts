@@ -172,7 +172,7 @@ export default function ExpandedTooltipDialog({
               onChange={(e) => updateContentBlock(block.id, e.target.value)}
               placeholder="Enter detailed text content..."
               rows={4}
-              className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+              className="bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
           </div>
         ) : (
