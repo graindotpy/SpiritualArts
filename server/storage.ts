@@ -58,12 +58,14 @@ export class MemStorage implements IStorage {
   private spiritDiePools: Map<string, SpiritDiePool>;
   private techniques: Map<string, Technique>;
   private activeEffects: Map<string, ActiveEffect>;
+  private glossaryTerms: Map<string, GlossaryTerm>;
 
   constructor() {
     this.characters = new Map();
     this.spiritDiePools = new Map();
     this.techniques = new Map();
     this.activeEffects = new Map();
+    this.glossaryTerms = new Map();
     
     // Initialize with R'aan Fames character
     this.initializeDefaultData();
@@ -141,7 +143,8 @@ export class MemStorage implements IStorage {
     const newCharacter: Character = { 
       ...character, 
       id,
-      level: character.level ?? 3 
+      level: character.level ?? 3,
+      portraitUrl: character.portraitUrl ?? null
     };
     this.characters.set(id, newCharacter);
     return newCharacter;
@@ -163,7 +166,11 @@ export class MemStorage implements IStorage {
 
   async createSpiritDiePool(pool: InsertSpiritDiePool): Promise<SpiritDiePool> {
     const id = randomUUID();
-    const newPool: SpiritDiePool = { ...pool, id };
+    const newPool: SpiritDiePool = { 
+      ...pool, 
+      id,
+      overrideDice: pool.overrideDice ?? null 
+    };
     this.spiritDiePools.set(id, newPool);
     return newPool;
   }
@@ -252,6 +259,36 @@ export class MemStorage implements IStorage {
   async deleteActiveEffect(id: string): Promise<boolean> {
     return this.activeEffects.delete(id);
   }
+
+  // Glossary Terms
+  async getGlossaryTerms(characterId: string): Promise<GlossaryTerm[]> {
+    return Array.from(this.glossaryTerms.values()).filter(term => term.characterId === characterId);
+  }
+
+  async createGlossaryTerm(term: InsertGlossaryTerm): Promise<GlossaryTerm> {
+    const id = randomUUID();
+    const newTerm: GlossaryTerm = { 
+      ...term, 
+      id,
+      expandedContent: term.expandedContent ?? null,
+      hasExpandedContent: term.hasExpandedContent ?? false
+    };
+    this.glossaryTerms.set(id, newTerm);
+    return newTerm;
+  }
+
+  async updateGlossaryTerm(id: string, term: Partial<GlossaryTerm>): Promise<GlossaryTerm | undefined> {
+    const existing = this.glossaryTerms.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...term };
+    this.glossaryTerms.set(id, updated);
+    return updated;
+  }
+
+  async deleteGlossaryTerm(id: string): Promise<boolean> {
+    return this.glossaryTerms.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -305,7 +342,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(spiritDiePools)
       .where(eq(spiritDiePools.characterId, characterId));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Techniques
@@ -399,6 +436,9 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
+// Create and export storage instance (using in-memory storage for now)
+export const storage = new MemStorage();
+
 // Initialize database with default character data
 async function initializeDatabase() {
   try {
@@ -460,7 +500,8 @@ async function initializeDatabase() {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Commented out database storage for now - using in-memory storage instead
+// export const storage = new DatabaseStorage();
 
-// Initialize on startup
-initializeDatabase();
+// Initialize on startup (commented out for now)
+// initializeDatabase();
