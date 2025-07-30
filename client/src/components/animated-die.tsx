@@ -35,22 +35,25 @@ export default function AnimatedDie({
     // Show random values during rolling
     const rollInterval = setInterval(() => {
       setCurrentValue(Math.floor(Math.random() * maxValue) + 1);
-    }, 120);
+    }, 150);
 
-    // Stop rolling after 1.5 seconds and show final result
+    // Stop rolling after 2 seconds and show final result
     const rollTimeout = setTimeout(() => {
       clearInterval(rollInterval);
-      setAnimationClass("animate-pulse");
+      setAnimationClass("");
       
       if (finalResult !== undefined) {
         setCurrentValue(finalResult);
-        // Final pulse before settling
+        // Show final result with gentle pulse
         setTimeout(() => {
-          setAnimationClass("");
-          onRollComplete?.(finalResult);
-        }, 500);
+          setAnimationClass("animate-pulse");
+          setTimeout(() => {
+            setAnimationClass("");
+            onRollComplete?.(finalResult);
+          }, 1000);
+        }, 100);
       }
-    }, 1500);
+    }, 2000);
 
     return () => {
       clearInterval(rollInterval);

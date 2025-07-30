@@ -65,19 +65,28 @@ export default {
       keyframes: {
         "roll-spin": {
           "0%": { transform: "rotate(0deg) scale(1)" },
-          "25%": { transform: "rotate(90deg) scale(1.1)" },
-          "50%": { transform: "rotate(180deg) scale(1)" },
-          "75%": { transform: "rotate(270deg) scale(1.1)" },
-          "100%": { transform: "rotate(360deg) scale(1)" },
+          "100%": { transform: "rotate(720deg) scale(1)" },
         },
         "roll-bounce": {
-          "0%, 100%": { 
-            transform: "translateY(0) rotate(0deg)",
-            animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)",
+          "0%": { 
+            transform: "translateY(0) rotate(0deg) scale(1)",
+            animationTimingFunction: "ease-out",
+          },
+          "25%": { 
+            transform: "translateY(-15px) rotate(90deg) scale(1.05)",
+            animationTimingFunction: "ease-in-out",
           },
           "50%": { 
-            transform: "translateY(-25%) rotate(180deg)",
-            animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+            transform: "translateY(0) rotate(180deg) scale(1)",
+            animationTimingFunction: "ease-in-out",
+          },
+          "75%": { 
+            transform: "translateY(-10px) rotate(270deg) scale(1.02)",
+            animationTimingFunction: "ease-in-out",
+          },
+          "100%": { 
+            transform: "translateY(0) rotate(360deg) scale(1)",
+            animationTimingFunction: "ease-in",
           },
         },
         "accordion-down": {
@@ -98,8 +107,8 @@ export default {
         },
       },
       animation: {
-        "roll-spin": "roll-spin 0.8s ease-in-out infinite",
-        "roll-bounce": "roll-bounce 0.6s ease-in-out infinite",
+        "roll-spin": "roll-spin 1.2s ease-in-out infinite",
+        "roll-bounce": "roll-bounce 1s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

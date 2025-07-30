@@ -59,10 +59,10 @@ export function useCharacterState(characterId: string | undefined) {
       return response.json();
     },
     onSuccess: (result) => {
-      // Delay the pool refresh to allow animation to complete
+      // Delay the pool refresh to allow animation to complete (extended timing)
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["/api/character", characterId, "spirit-die-pool"] });
-      }, 2000);
+      }, 3500);
       
       toast({
         title: result.success ? "Success!" : "Failed",

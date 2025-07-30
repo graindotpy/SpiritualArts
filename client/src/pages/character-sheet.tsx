@@ -147,11 +147,11 @@ export default function CharacterSheet({ character, onReturnToMenu }: CharacterS
           dieIndex: selectedDieIndex 
         });
         setRollResult(result.value);
-        // Stop rolling after animation completes
+        // Stop rolling after animation completes (extended for longer final display)
         setTimeout(() => {
           setIsRolling(false);
           setRollResult(null);
-        }, 2000);
+        }, 3500);
       } catch (error) {
         setIsRolling(false);
         setRollResult(null);
