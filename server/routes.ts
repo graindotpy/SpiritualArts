@@ -103,6 +103,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
+  // Health check endpoint for Railway
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      dbConnected: !!process.env.DATABASE_URL
+    });
+  });
+
+  // Root health check - Railway sometimes checks this
+  app.get('/', (req, res) => {
+    if (process.env.NODE_ENV === 'production') {
+      // In production, serve the frontend or health check
+      res.status(200).json({ 
+        status: 'ok',
+        message: 'Spirit Die Character Sheet App',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // In development, let Vite handle the root route
+      res.status(404).json({ message: 'Development mode - use Vite dev server' });
+    }
+  });
+
   // Serve uploaded files
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
