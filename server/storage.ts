@@ -347,45 +347,6 @@ export class MemStorage implements IStorage {
   async deleteGlossaryTerm(id: string): Promise<boolean> {
     return this.glossaryTerms.delete(id);
   }
-
-  // Users (for authentication) - MemStorage stub implementations
-  async getUser(id: string): Promise<User | undefined> {
-    // MemStorage doesn't support users - return undefined
-    return undefined;
-  }
-
-  async upsertUser(user: UpsertUser): Promise<User> {
-    // MemStorage doesn't support users - create a mock user
-    const mockUser: User = {
-      id: user.id || randomUUID(),
-      email: user.email || null,
-      firstName: user.firstName || null,
-      lastName: user.lastName || null,
-      profileImageUrl: user.profileImageUrl || null,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    return mockUser;
-  }
-
-  // Technique Preferences - MemStorage stub implementations
-  async getTechniquePreferences(userId: string): Promise<TechniquePreference[]> {
-    // MemStorage doesn't support preferences - return empty array
-    return [];
-  }
-
-  async upsertTechniquePreference(preference: InsertTechniquePreference): Promise<TechniquePreference> {
-    // MemStorage doesn't support preferences - create a mock preference
-    const mockPreference: TechniquePreference = {
-      id: randomUUID(),
-      userId: preference.userId,
-      techniqueId: preference.techniqueId,
-      isMinimized: preference.isMinimized ?? false,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    return mockPreference;
-  }
 }
 
 export class DatabaseStorage implements IStorage {

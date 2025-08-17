@@ -3,7 +3,6 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
-// Configure for serverless environment
 neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
@@ -12,14 +11,5 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Add connection pool configuration for Railway
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-export { pool };
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
