@@ -113,20 +113,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Root health check - Railway sometimes checks this
-  app.get('/', (req, res) => {
-    if (process.env.NODE_ENV === 'production') {
-      // In production, serve the frontend or health check
-      res.status(200).json({ 
-        status: 'ok',
-        message: 'Spirit Die Character Sheet App',
-        timestamp: new Date().toISOString()
-      });
-    } else {
-      // In development, let Vite handle the root route
-      res.status(404).json({ message: 'Development mode - use Vite dev server' });
-    }
-  });
+  // Root route handled by static file serving in production
+  // No explicit root route needed - serveStatic will handle it
 
   // Serve uploaded files
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
